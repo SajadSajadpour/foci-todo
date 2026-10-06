@@ -58,4 +58,13 @@ The backend tests use an in-memory implementation of the storage contract and do
 - The task queries are scoped by the authenticated user ID. The frontend calls relative `/api` URLs so it can use the same origin when deployed.
 - Authentication adds product scope beyond the assignment's minimum. Email verification, password recovery, and MFA are outside this assessment build.
 
+## Assumptions and trade-offs
+
+- The React app is the primary interface. The REST API is available for review and other clients, but the assessment does not require a separate CLI.
+- Accounts and private task lists are an added product choice; the assignment itself permits a simpler single-user application. Each account sees only its own tasks.
+- A due date is an optional calendar date in `YYYY-MM-DD` format. Past dates are valid, and no timezone conversion is applied. The server sets task IDs and creation timestamps.
+- PostgreSQL provides persistence across application and database-container restarts when its named volume is retained. Removing that volume deletes local data.
+- Filtering and sorting controls are optional in the brief and are not part of this implementation. The API returns tasks newest first.
+- The production configuration is prepared but has not been deployed. A public endpoint, real certificate, backups, and recovery verification require an EC2 host and domain.
+
 No AWS credentials are required to run the application locally. Provisioning an EC2 host, attaching a domain, issuing a public certificate, and checking the deployed service remain separate steps.

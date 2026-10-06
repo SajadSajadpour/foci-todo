@@ -6,7 +6,7 @@ The React frontend and TypeScript backend are separate applications in one repos
 
 ## Data model
 
-The implementation will define the schema in code and create versioned migrations. The intended relationships are:
+The schema is defined with Drizzle in `apps/backend/src/database/schema.ts`, with a versioned SQL migration. The relationships are:
 
 ```mermaid
 erDiagram
@@ -22,6 +22,7 @@ erDiagram
         uuid id PK
         uuid user_id FK
         string token_hash
+        string csrf_token
         timestamp expires_at
         timestamp created_at
     }
@@ -36,7 +37,7 @@ erDiagram
     }
 ```
 
-Session storage is a design intention until implemented; the final architecture document will reflect the actual code.
+Session tokens are hashed before storage. PostgreSQL persists accounts, sessions, and tasks in a named Docker volume during local container runs.
 
 ## Main user journey
 
@@ -52,4 +53,4 @@ flowchart LR
 
 ## Security decisions
 
-Password hashing, authenticated task ownership checks, safe cookie configuration, and CSRF protection will be implemented and tested with the authentication slice. Account recovery and email verification are outside this assessment scope; these limits must be stated in the completed README. Public deployment will require HTTPS and disposable demo data.
+Passwords use Argon2id hashes. The API scopes task reads and writes to the authenticated user, sends session tokens in HttpOnly, SameSite=Strict cookies, and requires a per-session CSRF token for authenticated mutations. Production cookies are marked Secure. Account recovery and email verification remain outside the assessment implementation. The prepared public deployment configuration requires HTTPS with TLS 1.3; no public deployment has been performed.
