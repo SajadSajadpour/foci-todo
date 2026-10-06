@@ -4,7 +4,7 @@ React, TypeScript, and Vite application for Foci Tasks. The [Figma design](https
 
 ## Current status
 
-Sign-in, registration, session restoration, sign-out, API error handling, and protected routing are implemented. The task list, create form, read-only detail page, and completion/reopening are wired to the API. The UI includes loading, empty, validation, and failure states. Editing and deletion are still pending, so the frontend is not yet a complete submission.
+Sign-in, registration, session restoration, sign-out, API error handling, and protected routing are implemented. The task list, create/edit forms, detail page, completion/reopening, and confirmed deletion are wired to the API. The UI includes loading, empty, validation, and failure states.
 
 ## Run
 
@@ -14,4 +14,4 @@ From the repository root, install dependencies with `npm ci`, start PostgreSQL a
 npm run dev:frontend
 ```
 
-Open `http://localhost:5173`. Run `npm run typecheck:frontend` and `npm run build:frontend` for static checks. The login and registration flows require a running backend and PostgreSQL database. The authentication and task screens were visually checked at desktop and narrow mobile widths. A browser smoke test of task creation and completion used a local test API; a live PostgreSQL API smoke test passed, while a full browser end-to-end test against PostgreSQL remains pending.
+Open `http://localhost:5173`. Run `npm run typecheck:frontend` and `npm run build:frontend` for static checks. The login and registration flows require a running backend and PostgreSQL database. The authentication and task screens were checked at desktop and narrow mobile widths. A live PostgreSQL browser check covered sign-in, creation, title validation, editing, canceling and confirming deletion, and empty-state return. Broader automated browser and accessibility checks remain.

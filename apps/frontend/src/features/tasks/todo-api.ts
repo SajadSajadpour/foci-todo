@@ -22,4 +22,8 @@ export const todoApi = {
     apiRequest<{ todo: Todo }>('/api/todos', { method: 'POST', body: todo, csrfToken }),
   setCompleted: (id: string, isCompleted: boolean, csrfToken: string) =>
     apiRequest<{ todo: Todo }>(`/api/todos/${encodeURIComponent(id)}`, { method: 'PATCH', body: { isCompleted }, csrfToken }),
+  update: (id: string, changes: NewTodo, csrfToken: string) =>
+    apiRequest<{ todo: Todo }>(`/api/todos/${encodeURIComponent(id)}`, { method: 'PATCH', body: changes, csrfToken }),
+  remove: (id: string, csrfToken: string) =>
+    apiRequest<void>(`/api/todos/${encodeURIComponent(id)}`, { method: 'DELETE', csrfToken }),
 };

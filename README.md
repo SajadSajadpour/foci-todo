@@ -9,9 +9,9 @@ The product scope and acceptance criteria are in the [planning document](../Foci
 
 ## Current status
 
-The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, and user isolation. The responsive frontend implements authentication, protected routing, task list, creation, read-only detail, and completion/reopening. Task editing and deletion are the next frontend step.
+The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, and user isolation. The responsive frontend implements authentication, protected routing, task listing, creation, detail, editing, completion/reopening, and confirmed deletion.
 
-## Run the backend locally
+## Run locally
 
 Requirements: Node.js 22 or later, npm, and Docker with Compose. Docker must be running for the database commands.
 
@@ -21,6 +21,11 @@ cp apps/backend/.env.example apps/backend/.env
 docker compose up --wait -d db
 npm run db:migrate -w @foci/backend
 npm run dev:backend
+```
+
+In a second terminal from the repository root:
+
+```bash
 npm run dev:frontend
 ```
 
@@ -34,7 +39,7 @@ npm run typecheck:frontend
 npm run build:frontend
 ```
 
-The automated tests currently use an in-memory implementation of the storage contract and do not require Docker. A local PostgreSQL smoke test has also verified registration, login, task creation, listing, and deletion through the API; repeat it in each deployment environment.
+The automated tests currently use an in-memory implementation of the storage contract and do not require Docker. Local PostgreSQL checks have verified registration, login, and task creation, listing, editing, and deletion through the API and browser. Repeat those checks in each deployment environment.
 
 ## Current design choices
 
@@ -44,4 +49,4 @@ The automated tests currently use an in-memory implementation of the storage con
 - The task queries are scoped by the authenticated user ID. The frontend calls relative `/api` URLs so it can use the same origin when deployed.
 - Authentication adds product scope beyond the assignment's minimum. Email verification, password recovery, and MFA are outside this assessment build.
 
-Frontend editing/deletion, CI, and deployment will be completed in later steps. No AWS credentials are required to run the application locally.
+CI, deployment, and broader browser/accessibility checks will be completed in later steps. No AWS credentials are required to run the application locally.

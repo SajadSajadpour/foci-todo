@@ -4,4 +4,5 @@ export const routes = {
   tasks: '/tasks',
   newTask: '/tasks/new',
   task: (id: string) => `/tasks/${id}`,
+  editTask: (id: string) => `/tasks/${id}/edit`,
 } as const;

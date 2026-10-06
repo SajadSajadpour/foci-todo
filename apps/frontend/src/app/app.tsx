@@ -8,6 +8,7 @@ import { TaskShell } from '../features/tasks/task-shell';
 import { TaskListPage } from '../features/tasks/task-list-page';
 import { NewTaskPage } from '../features/tasks/new-task-page';
 import { TaskDetailPage } from '../features/tasks/task-detail-page';
+import { EditTaskPage } from '../features/tasks/edit-task-page';
 
 function SessionGate({ protectedRoute }: { protectedRoute: boolean }) {
   const { state, refresh } = useSession();
@@ -32,6 +33,7 @@ export function App() {
           <Route path={routes.tasks} element={<TaskListPage />} />
           <Route path={routes.newTask} element={<NewTaskPage />} />
           <Route path="/tasks/:id" element={<TaskDetailPage />} />
+          <Route path="/tasks/:id/edit" element={<EditTaskPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to={routes.tasks} replace />} />

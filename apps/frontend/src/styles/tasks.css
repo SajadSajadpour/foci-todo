@@ -60,7 +60,7 @@
 .date-input-wrap > img { position: absolute; right: 14px; top: 16px; width: 20px; height: 20px; pointer-events: none; }
 .task-form-actions { display: flex; gap: 12px; align-items: center; margin-top: 4px; }
 .task-form-actions .button { text-decoration: none; }
-.task-form-actions [aria-disabled="true"] { opacity: 0.6; pointer-events: none; }
+.task-form-actions [aria-disabled="true"], .back-link[aria-disabled="true"] { opacity: 0.6; pointer-events: none; }
 
 .task-detail-column > .status-label { margin-top: 16px; }
 .task-detail-column h1 { margin: 16px 0 24px; overflow-wrap: anywhere; }
@@ -71,10 +71,22 @@
 .task-detail-description { margin-top: 32px; }
 .task-detail-description h2 { margin: 0 0 16px; font-size: 14px; line-height: 21px; font-weight: 600; }
 .task-detail-description p { margin: 0; font-size: 16px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
-.task-detail-actions { display: flex; gap: 12px; margin-top: 32px; }
+.task-detail-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 .task-detail-actions .button { gap: 8px; }
+.task-detail-actions a.button { text-decoration: none; }
 .task-detail-actions img { width: 15px; height: 15px; }
 .detail-loading { color: var(--muted); font-size: 16px; line-height: 1.6; }
+.button-danger { color: #fff; background: var(--danger); border-color: var(--danger); }
+.button-danger:hover:not(:disabled) { background: #84271e; }
+.button-danger:disabled { opacity: 0.62; }
+.button-danger-quiet { color: var(--danger); background: transparent; border-color: transparent; }
+.button-danger-quiet:hover { background: var(--danger-subtle); }
+.delete-dialog { width: min(480px, calc(100vw - 40px)); max-width: none; padding: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--ink); box-shadow: 0 24px 70px rgba(20, 35, 29, 0.2); }
+.delete-dialog::backdrop { background: rgba(20, 35, 29, 0.48); }
+.delete-dialog-content { padding: 32px; }
+.delete-dialog h2 { margin: 0; font-family: Lora, Georgia, serif; font-size: 28px; font-weight: 400; line-height: 1.25; }
+.delete-dialog p { margin: 12px 0 24px; color: var(--muted); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.delete-dialog-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
 
 @media (max-width: 600px) {
   .tasks-main, .task-form-main, .task-detail-main { padding: 36px 20px 48px; }
@@ -94,4 +106,7 @@
   .task-detail-metadata { flex-direction: column; gap: 12px; }
   .task-detail-actions { flex-direction: column; }
   .task-detail-actions .button { width: 100%; }
+  .delete-dialog-content { padding: 24px; }
+  .delete-dialog-actions { flex-direction: column; }
+  .delete-dialog-actions .button { width: 100%; }
 }

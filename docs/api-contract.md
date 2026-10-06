@@ -2,7 +2,7 @@
 
 All endpoints use the `/api` prefix and JSON request and response bodies except logout and delete, which may return `204 No Content`. The browser uses a server-managed session cookie. Task routes require an authenticated session.
 
-**Implementation status:** authentication and all task routes below are implemented. The frontend has authentication, listing, creation, read-only detail, and completion/reopening; editing and deletion remain. Live PostgreSQL verification is still pending.
+**Implementation status:** authentication and all task routes below are implemented and connected to the frontend. Local PostgreSQL verification covers registration, login, task creation, listing, editing, and deletion.
 
 | Method | Path | Purpose | Success | Main errors |
 | --- | --- | --- | --- | --- |

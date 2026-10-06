@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import arrowLeftIcon from '../../assets/icons/arrow-left.svg';
 import checkIcon from '../../assets/icons/check.svg';
@@ -11,6 +11,7 @@ import { useSession } from '../auth/session-context';
 import { formatCalendarDate, formatCreatedAt } from './date-format';
 import { todoApi } from './todo-api';
 import type { Todo } from './todo-api';
+import { DeleteTaskDialog } from './delete-task-dialog';
 
 export function TaskDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,8 @@ export function TaskDetailPage() {
   const [loadError, setLoadError] = useState('');
   const [actionError, setActionError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
   const { state, refresh } = useSession();
 
   useEffect(() => {
@@ -82,7 +85,10 @@ export function TaskDetailPage() {
             <button className="button button-primary" type="button" disabled={saving} onClick={() => void handleCompletion()}>
               {todo.isCompleted ? 'Reopen task' : <><img src={checkIcon} alt="" />Mark complete</>}
             </button>
+            <Link className="button button-secondary" to={routes.editTask(todo.id)}>Edit task</Link>
+            <button ref={deleteButtonRef} className="button button-danger-quiet" type="button" onClick={() => setDeleteOpen(true)}>Delete task</button>
           </div>
+          {deleteOpen && <DeleteTaskDialog todo={todo} onDismiss={() => { setDeleteOpen(false); deleteButtonRef.current?.focus(); }} />}
         </>}
       </div>
     </main>
