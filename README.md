@@ -39,7 +39,14 @@ npm run typecheck:frontend
 npm run build:frontend
 ```
 
-The automated tests currently use an in-memory implementation of the storage contract and do not require Docker. Local PostgreSQL checks have verified registration, login, and task creation, listing, editing, and deletion through the API and browser. Repeat those checks in each deployment environment.
+For browser tests, install the test browser once, then run the journey on desktop and mobile widths against local PostgreSQL:
+
+```bash
+npm run test:e2e:install
+npm run test:e2e
+```
+
+The backend tests use an in-memory implementation of the storage contract and do not require Docker. The browser tests start the Compose database, run migrations, and start the API and UI when needed. They use unique local test accounts and check task CRUD, responsive overflow, form/dialog behavior, and WCAG 2.0/2.1 A and AA rules with axe. GitHub Actions runs these checks on pushes and pull requests. The test suite does not reset your database; keep the local Compose database for development and repeat checks in each deployment environment.
 
 ## Current design choices
 
@@ -49,4 +56,4 @@ The automated tests currently use an in-memory implementation of the storage con
 - The task queries are scoped by the authenticated user ID. The frontend calls relative `/api` URLs so it can use the same origin when deployed.
 - Authentication adds product scope beyond the assignment's minimum. Email verification, password recovery, and MFA are outside this assessment build.
 
-CI, deployment, and broader browser/accessibility checks will be completed in later steps. No AWS credentials are required to run the application locally.
+Deployment and production configuration will be completed in later steps. No AWS credentials are required to run the application locally.

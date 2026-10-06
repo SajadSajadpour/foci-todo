@@ -14,4 +14,4 @@ From the repository root, install dependencies with `npm ci`, start PostgreSQL a
 npm run dev:frontend
 ```
 
-Open `http://localhost:5173`. Run `npm run typecheck:frontend` and `npm run build:frontend` for static checks. The login and registration flows require a running backend and PostgreSQL database. The authentication and task screens were checked at desktop and narrow mobile widths. A live PostgreSQL browser check covered sign-in, creation, title validation, editing, canceling and confirming deletion, and empty-state return. Broader automated browser and accessibility checks remain.
+Open `http://localhost:5173`. Run `npm run typecheck:frontend` and `npm run build:frontend` for static checks. The login and registration flows require a running backend and PostgreSQL database. The authentication and task screens were checked at desktop and narrow mobile widths. The root `npm run test:e2e` command runs the live PostgreSQL journey in desktop and mobile Chromium and checks the main screens with axe.

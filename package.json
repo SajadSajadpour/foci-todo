@@ -1,7 +1,10 @@
 {
   "name": "foci-todo",
   "private": true,
-  "workspaces": ["apps/backend", "apps/frontend"],
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
   "scripts": {
     "dev:backend": "npm run dev -w @foci/backend",
     "test:backend": "npm run test -w @foci/backend",
@@ -9,6 +12,12 @@
     "build:backend": "npm run build -w @foci/backend",
     "dev:frontend": "npm run dev -w @foci/frontend",
     "typecheck:frontend": "npm run typecheck -w @foci/frontend",
-    "build:frontend": "npm run build -w @foci/frontend"
+    "build:frontend": "npm run build -w @foci/frontend",
+    "test:e2e": "docker compose up --wait -d db && npm run db:migrate -w @foci/backend && PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+    "test:e2e:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0"
   }
 }
