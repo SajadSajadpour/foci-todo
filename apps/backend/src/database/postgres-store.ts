@@ -2,7 +2,7 @@ import { desc, eq, and, gt } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { sessions, todos, users } from './schema.js';
-import type { Session, Store, Todo, User } from '../features/types.js';
+import type { Session, Store, Todo, TodoChanges, User } from '../features/types.js';
 
 export function createPostgresStore(databaseUrl: string): { store: Store; close: () => Promise<void> } {
   const pool = new Pool({ connectionString: databaseUrl });
@@ -36,6 +36,18 @@ export function createPostgresStore(databaseUrl: string): { store: Store; close:
     },
     async listTodos(userId): Promise<Todo[]> {
       return db.select().from(todos).where(eq(todos.userId, userId)).orderBy(desc(todos.createdAt), desc(todos.id));
+    },
+    async findTodo(userId, id): Promise<Todo | null> {
+      const [row] = await db.select().from(todos).where(and(eq(todos.userId, userId), eq(todos.id, id))).limit(1);
+      return row ?? null;
+    },
+    async updateTodo(userId, id, changes: TodoChanges): Promise<Todo | null> {
+      const [row] = await db.update(todos).set(changes).where(and(eq(todos.userId, userId), eq(todos.id, id))).returning();
+      return row ?? null;
+    },
+    async deleteTodo(userId, id): Promise<boolean> {
+      const rows = await db.delete(todos).where(and(eq(todos.userId, userId), eq(todos.id, id))).returning({ id: todos.id });
+      return rows.length > 0;
     },
   };
 

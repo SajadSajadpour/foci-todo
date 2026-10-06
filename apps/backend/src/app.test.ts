@@ -28,6 +28,21 @@ function memoryStore(): Store {
       return todo;
     },
     async listTodos(userId) { return [...todos.values()].filter((todo) => todo.userId === userId); },
+    async findTodo(userId, id) {
+      const todo = todos.get(id);
+      return todo?.userId === userId ? todo : null;
+    },
+    async updateTodo(userId, id, changes) {
+      const todo = todos.get(id);
+      if (!todo || todo.userId !== userId) return null;
+      const updated = { ...todo, ...changes };
+      todos.set(id, updated);
+      return updated;
+    },
+    async deleteTodo(userId, id) {
+      const todo = todos.get(id);
+      return todo?.userId === userId ? todos.delete(id) : false;
+    },
   };
 }
 
@@ -99,6 +114,47 @@ describe('account and first task slice', () => {
       const logout = await app.inject({ method: 'POST', url: '/api/auth/logout', headers: { cookie: alice.cookie, 'x-csrf-token': alice.csrf } });
       expect(logout.statusCode).toBe(204);
       expect((await app.inject({ method: 'GET', url: '/api/auth/me', headers: { cookie: alice.cookie } })).statusCode).toBe(401);
+    } finally {
+      await app.close();
+    }
+  });
+
+  it('supports the full task lifecycle and keeps each task private', async () => {
+    const app = await buildApp(memoryStore());
+    try {
+      const alice = await signIn(app, 'alice@example.com');
+      const bob = await signIn(app, 'bob@example.com');
+      const auth = (person: typeof alice) => ({ cookie: person.cookie, 'x-csrf-token': person.csrf });
+      const create = await app.inject({ method: 'POST', url: '/api/todos', headers: auth(alice), payload: { title: 'First task', description: 'Details' } });
+      const id = create.json().todo.id as string;
+      const url = `/api/todos/${id}`;
+
+      expect((await app.inject({ method: 'GET', url, headers: auth(alice) })).json().todo.title).toBe('First task');
+      expect((await app.inject({ method: 'GET', url, headers: auth(bob) })).statusCode).toBe(404);
+      expect((await app.inject({ method: 'PATCH', url, headers: auth(bob), payload: { title: 'Hijacked' } })).statusCode).toBe(404);
+      expect((await app.inject({ method: 'DELETE', url, headers: auth(bob) })).statusCode).toBe(404);
+
+      const update = await app.inject({ method: 'PATCH', url, headers: auth(alice), payload: { title: '  Updated task  ', description: null, dueDate: '2026-10-10', isCompleted: true } });
+      expect(update.statusCode).toBe(200);
+      expect(update.json().todo).toMatchObject({ title: 'Updated task', description: null, dueDate: '2026-10-10', isCompleted: true });
+
+      const incomplete = await app.inject({ method: 'PATCH', url, headers: auth(alice), payload: { isCompleted: false } });
+      expect(incomplete.json().todo).toMatchObject({ title: 'Updated task', dueDate: '2026-10-10', isCompleted: false });
+      const repeat = await app.inject({ method: 'PATCH', url, headers: auth(alice), payload: { isCompleted: false } });
+      expect(repeat.json().todo.isCompleted).toBe(false);
+
+      const clearDueDate = await app.inject({ method: 'PATCH', url, headers: auth(alice), payload: { dueDate: null } });
+      expect(clearDueDate.json().todo.dueDate).toBeNull();
+
+      expect((await app.inject({ method: 'PATCH', url, headers: auth(alice), payload: {} })).statusCode).toBe(400);
+      expect((await app.inject({ method: 'PATCH', url, headers: auth(alice), payload: { title: '  ' } })).statusCode).toBe(400);
+      expect((await app.inject({ method: 'PATCH', url, headers: auth(alice), payload: { dueDate: '2026-02-30' } })).statusCode).toBe(400);
+      expect((await app.inject({ method: 'PATCH', url, headers: { cookie: alice.cookie }, payload: { isCompleted: true } })).statusCode).toBe(403);
+      expect((await app.inject({ method: 'DELETE', url, headers: { cookie: alice.cookie } })).statusCode).toBe(403);
+
+      expect((await app.inject({ method: 'DELETE', url, headers: auth(alice) })).statusCode).toBe(204);
+      expect((await app.inject({ method: 'GET', url, headers: auth(alice) })).statusCode).toBe(404);
+      expect((await app.inject({ method: 'GET', url: '/api/todos', headers: auth(alice) })).json().todos).toEqual([]);
     } finally {
       await app.close();
     }

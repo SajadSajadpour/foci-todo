@@ -21,6 +21,8 @@ export type Todo = {
   createdAt: Date;
 };
 
+export type TodoChanges = Partial<Pick<Todo, 'title' | 'description' | 'dueDate' | 'isCompleted'>>;
+
 export interface Store {
   findUserByEmail(email: string): Promise<User | null>;
   createUser(email: string, passwordHash: string): Promise<User>;
@@ -29,4 +31,7 @@ export interface Store {
   deleteSession(tokenHash: string): Promise<void>;
   createTodo(userId: string, title: string, description: string | null, dueDate: string | null): Promise<Todo>;
   listTodos(userId: string): Promise<Todo[]>;
+  findTodo(userId: string, id: string): Promise<Todo | null>;
+  updateTodo(userId: string, id: string, changes: TodoChanges): Promise<Todo | null>;
+  deleteTodo(userId: string, id: string): Promise<boolean>;
 }

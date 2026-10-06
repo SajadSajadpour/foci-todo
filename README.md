@@ -9,7 +9,7 @@ The product scope and acceptance criteria are in the [planning document](../Foci
 
 ## Current status
 
-The backend's first vertical slice is implemented: registration, login, logout, current session, task creation, and task listing. Automated HTTP tests cover validation, CSRF checks, logout, and user isolation. Task detail, update, delete, and the frontend remain to be built.
+The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, and user isolation. The frontend remains to be built.
 
 ## Run the backend locally
 
@@ -41,4 +41,4 @@ The automated tests currently use an in-memory implementation of the storage con
 - The task queries are scoped by the authenticated user ID. The frontend will call the API through the same origin when deployed.
 - Authentication adds product scope beyond the assignment's minimum. Email verification, password recovery, and MFA are outside this assessment build.
 
-The API's remaining task endpoints, frontend, CI, and deployment will be completed in later steps. No AWS credentials are required to run the application locally.
+The frontend, CI, and deployment will be completed in later steps. No AWS credentials are required to run the application locally.

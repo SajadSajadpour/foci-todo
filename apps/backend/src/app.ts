@@ -12,6 +12,9 @@ const DESCRIPTION_MAX = 5000;
 
 type Credentials = { email: string; password: string };
 type NewTodo = { title: string; description?: string | null; dueDate?: string | null };
+type TodoUpdate = { title?: string; description?: string | null; dueDate?: string | null; isCompleted?: boolean };
+type TodoParams = { id: string };
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const credentialsSchema = {
   type: 'object',
@@ -29,8 +32,20 @@ const newTodoSchema = {
   additionalProperties: false,
   properties: {
     title: { type: 'string', maxLength: TITLE_MAX },
-    description: { anyOf: [{ type: 'string', maxLength: DESCRIPTION_MAX }, { type: 'null' }] },
-    dueDate: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    description: { type: 'string', nullable: true, maxLength: DESCRIPTION_MAX },
+    dueDate: { type: 'string', nullable: true },
+  },
+} as const;
+
+const updateTodoSchema = {
+  type: 'object',
+  minProperties: 1,
+  additionalProperties: false,
+  properties: {
+    title: { type: 'string', maxLength: TITLE_MAX },
+    description: { type: 'string', nullable: true, maxLength: DESCRIPTION_MAX },
+    dueDate: { type: 'string', nullable: true },
+    isCompleted: { type: 'boolean' },
   },
 } as const;
 
@@ -160,6 +175,41 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     const session = await sessionFor(request, reply);
     if (!session) return;
     return { todos: (await store.listTodos(session.userId)).map(publicTodo) };
+  });
+
+  app.get<{ Params: TodoParams }>('/api/todos/:id', async (request, reply) => {
+    const session = await sessionFor(request, reply);
+    if (!session) return;
+    const todo = UUID_PATTERN.test(request.params.id) ? await store.findTodo(session.userId, request.params.id) : null;
+    if (!todo) return reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'Task not found.' } });
+    return { todo: publicTodo(todo) };
+  });
+
+  app.patch<{ Params: TodoParams; Body: TodoUpdate }>('/api/todos/:id', { schema: { body: updateTodoSchema } }, async (request, reply) => {
+    const session = await sessionFor(request, reply, true);
+    if (!session) return;
+    if (!UUID_PATTERN.test(request.params.id)) {
+      return reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'Task not found.' } });
+    }
+    const changes = { ...request.body };
+    if (changes.title !== undefined) {
+      changes.title = changes.title.trim();
+      if (!changes.title) return reply.code(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Title cannot be blank.' } });
+    }
+    if (changes.dueDate !== undefined && changes.dueDate !== null && !validDate(changes.dueDate)) {
+      return reply.code(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Provide a valid due date.' } });
+    }
+    const todo = await store.updateTodo(session.userId, request.params.id, changes);
+    if (!todo) return reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'Task not found.' } });
+    return { todo: publicTodo(todo) };
+  });
+
+  app.delete<{ Params: TodoParams }>('/api/todos/:id', async (request, reply) => {
+    const session = await sessionFor(request, reply, true);
+    if (!session) return;
+    const deleted = UUID_PATTERN.test(request.params.id) && await store.deleteTodo(session.userId, request.params.id);
+    if (!deleted) return reply.code(404).send({ error: { code: 'NOT_FOUND', message: 'Task not found.' } });
+    return reply.code(204).send();
   });
 
   return app;
