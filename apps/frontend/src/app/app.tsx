@@ -1,11 +1,13 @@
-import { useState } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { routes } from './routes';
 import { LoginPage } from '../features/auth/login-page';
 import { RegisterPage } from '../features/auth/register-page';
 import { useSession } from '../features/auth/session-context';
-import { Brand } from '../shared/components/brand';
 import { ErrorMessage } from '../shared/components/feedback';
+import { TaskShell } from '../features/tasks/task-shell';
+import { TaskListPage } from '../features/tasks/task-list-page';
+import { NewTaskPage } from '../features/tasks/new-task-page';
+import { TaskDetailPage } from '../features/tasks/task-detail-page';
 
 function SessionGate({ protectedRoute }: { protectedRoute: boolean }) {
   const { state, refresh } = useSession();
@@ -18,29 +20,6 @@ function SessionGate({ protectedRoute }: { protectedRoute: boolean }) {
   return <Outlet />;
 }
 
-function TasksHome() {
-  const { logout } = useSession();
-  const [error, setError] = useState('');
-  async function handleLogout() {
-    setError('');
-    try {
-      await logout();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not sign out. Please try again.');
-    }
-  }
-  return (
-    <div className="page-shell">
-      <header className="site-header"><Brand /><button className="text-action" type="button" onClick={() => void handleLogout()}>Sign out</button></header>
-      <main className="task-content">
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <h1>My tasks</h1>
-        <p>The task views are the next frontend step. Your account session is connected.</p>
-      </main>
-    </div>
-  );
-}
-
 export function App() {
   return (
     <Routes>
@@ -49,7 +28,11 @@ export function App() {
         <Route path={routes.register} element={<RegisterPage />} />
       </Route>
       <Route element={<SessionGate protectedRoute />}>
-        <Route path={routes.tasks} element={<TasksHome />} />
+        <Route element={<TaskShell />}>
+          <Route path={routes.tasks} element={<TaskListPage />} />
+          <Route path={routes.newTask} element={<NewTaskPage />} />
+          <Route path="/tasks/:id" element={<TaskDetailPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to={routes.tasks} replace />} />
     </Routes>

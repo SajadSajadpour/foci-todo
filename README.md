@@ -9,7 +9,7 @@ The product scope and acceptance criteria are in the [planning document](../Foci
 
 ## Current status
 
-The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, and user isolation. The frontend has a responsive authentication slice and protected routing; task screens remain to be built.
+The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, and user isolation. The responsive frontend implements authentication, protected routing, task list, creation, read-only detail, and completion/reopening. Task editing and deletion are the next frontend step.
 
 ## Run the backend locally
 
@@ -41,7 +41,7 @@ The automated tests currently use an in-memory implementation of the storage con
 - Fastify handles HTTP and request validation; a storage interface keeps those concerns apart from PostgreSQL access.
 - Drizzle defines the PostgreSQL schema in code and generates a versioned SQL migration.
 - Passwords use Argon2id hashes. Random session tokens are hashed before storage and sent in HttpOnly cookies. State-changing authenticated requests require a per-session CSRF token.
-- The task queries are scoped by the authenticated user ID. The frontend will call the API through the same origin when deployed.
+- The task queries are scoped by the authenticated user ID. The frontend calls relative `/api` URLs so it can use the same origin when deployed.
 - Authentication adds product scope beyond the assignment's minimum. Email verification, password recovery, and MFA are outside this assessment build.
 
-The remaining frontend task screens, CI, and deployment will be completed in later steps. No AWS credentials are required to run the application locally.
+Frontend editing/deletion, CI, and deployment will be completed in later steps. No AWS credentials are required to run the application locally.

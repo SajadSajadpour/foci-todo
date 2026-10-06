@@ -8,6 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { App } from './app/app';
 import { SessionProvider } from './features/auth/session-context';
 import './styles/global.css';
+import './styles/tasks.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
