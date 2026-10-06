@@ -14,4 +14,4 @@ From the repository root, install dependencies with `npm ci`, start PostgreSQL a
 npm run dev:frontend
 ```
 
-Open `http://localhost:5173`. Run `npm run typecheck:frontend` and `npm run build:frontend` for static checks. The login and registration flows require a running backend and PostgreSQL database. The authentication and task screens were visually checked at desktop and narrow mobile widths. A browser smoke test of task creation and completion used a local test API; a full end-to-end test against PostgreSQL remains pending.
+Open `http://localhost:5173`. Run `npm run typecheck:frontend` and `npm run build:frontend` for static checks. The login and registration flows require a running backend and PostgreSQL database. The authentication and task screens were visually checked at desktop and narrow mobile widths. A browser smoke test of task creation and completion used a local test API; a live PostgreSQL API smoke test passed, while a full browser end-to-end test against PostgreSQL remains pending.

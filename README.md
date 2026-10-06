@@ -18,13 +18,13 @@ Requirements: Node.js 22 or later, npm, and Docker with Compose. Docker must be 
 ```bash
 npm ci
 cp apps/backend/.env.example apps/backend/.env
-docker compose up -d db
+docker compose up --wait -d db
 npm run db:migrate -w @foci/backend
 npm run dev:backend
 npm run dev:frontend
 ```
 
-The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. The frontend listens on `http://localhost:5173` and proxies `/api` to the backend. The local Compose configuration binds PostgreSQL to `127.0.0.1:5432` and keeps its data in a named volume. If that port is already used, change the host port and `.env` together.
+The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. The frontend listens on `http://localhost:5173` and proxies `/api` to the backend. The local Compose configuration binds PostgreSQL to `127.0.0.1:5433` (container port 5432) and keeps its data in a named volume. If that host port is already used, change the host port and `.env` together.
 
 ```bash
 npm run test:backend
@@ -34,7 +34,7 @@ npm run typecheck:frontend
 npm run build:frontend
 ```
 
-The automated tests currently use an in-memory implementation of the storage contract and do not require Docker. Running migrations and checking persistence against a live PostgreSQL instance remains a separate verification step.
+The automated tests currently use an in-memory implementation of the storage contract and do not require Docker. A local PostgreSQL smoke test has also verified registration, login, task creation, listing, and deletion through the API; repeat it in each deployment environment.
 
 ## Current design choices
 
