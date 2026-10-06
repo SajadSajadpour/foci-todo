@@ -63,6 +63,30 @@ async function signIn(app: Awaited<ReturnType<typeof buildApp>>, email: string) 
 }
 
 describe('account and first task slice', () => {
+  it('publishes an OpenAPI contract and Swagger UI matching the authenticated routes', async () => {
+    const app = await buildApp(memoryStore());
+    try {
+      const response = await app.inject({ method: 'GET', url: '/api/docs/json' });
+      expect(response.statusCode).toBe(200);
+      const spec = response.json();
+      expect(spec.openapi).toMatch(/^3\./);
+      expect(Object.keys(spec.paths)).toEqual([
+        '/api/health', '/api/auth/register', '/api/auth/login', '/api/auth/me',
+        '/api/auth/logout', '/api/todos', '/api/todos/{id}',
+      ]);
+      expect(spec.paths['/api/auth/register'].post.requestBody.content['application/json'].schema.required).toContain('password');
+      expect(spec.paths['/api/auth/login'].post.responses['200'].content['application/json'].schema.properties).toHaveProperty('csrfToken');
+      expect(spec.paths['/api/auth/me'].get.security).toEqual([{ sessionCookie: [] }]);
+      expect(spec.paths['/api/todos'].post.security).toEqual([{ sessionCookie: [], csrfToken: [] }]);
+      expect(spec.paths['/api/todos/{id}'].patch.security).toEqual([{ sessionCookie: [], csrfToken: [] }]);
+      expect(spec.components.securitySchemes.sessionCookie.name).toBe('foci_session');
+      expect(spec.components.securitySchemes.csrfToken.name).toBe('X-CSRF-Token');
+      expect((await app.inject({ method: 'GET', url: '/api/docs/' })).statusCode).toBe(200);
+    } finally {
+      await app.close();
+    }
+  });
+
   it('registers, signs in, creates a task, and isolates each user’s list', async () => {
     const app = await buildApp(memoryStore());
     try {

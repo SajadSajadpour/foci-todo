@@ -3,6 +3,7 @@ import cookie from '@fastify/cookie';
 import Fastify from 'fastify';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { errorResponse, loginResponse, mutationSecurity, registerApiDocs, sessionResponse, sessionSecurity, todoParams, todoResponse, todosResponse, userResponse } from './api-docs.js';
 import type { Session, Store, Todo } from './features/types.js';
 
 const SESSION_COOKIE = 'foci_session';
@@ -21,8 +22,8 @@ const credentialsSchema = {
   required: ['email', 'password'],
   additionalProperties: false,
   properties: {
-    email: { type: 'string', minLength: 3, maxLength: 254 },
-    password: { type: 'string', minLength: 12, maxLength: 1024 },
+    email: { type: 'string', minLength: 3, maxLength: 254, description: 'Email address, normalized to lowercase.' },
+    password: { type: 'string', minLength: 12, maxLength: 1024, description: 'At least 12 characters.' },
   },
 } as const;
 
@@ -31,9 +32,9 @@ const newTodoSchema = {
   required: ['title'],
   additionalProperties: false,
   properties: {
-    title: { type: 'string', maxLength: TITLE_MAX },
+    title: { type: 'string', maxLength: TITLE_MAX, description: 'Nonblank after trimming whitespace.' },
     description: { type: 'string', nullable: true, maxLength: DESCRIPTION_MAX },
-    dueDate: { type: 'string', nullable: true },
+    dueDate: { type: 'string', nullable: true, description: 'Valid calendar date in YYYY-MM-DD format, or null.' },
   },
 } as const;
 
@@ -42,9 +43,9 @@ const updateTodoSchema = {
   minProperties: 1,
   additionalProperties: false,
   properties: {
-    title: { type: 'string', maxLength: TITLE_MAX },
+    title: { type: 'string', maxLength: TITLE_MAX, description: 'Nonblank after trimming whitespace.' },
     description: { type: 'string', nullable: true, maxLength: DESCRIPTION_MAX },
-    dueDate: { type: 'string', nullable: true },
+    dueDate: { type: 'string', nullable: true, description: 'Valid calendar date in YYYY-MM-DD format, or null.' },
     isCompleted: { type: 'boolean' },
   },
 } as const;
@@ -80,6 +81,7 @@ function equalToken(actual: string, expected: string): boolean {
 export async function buildApp(store: Store): Promise<FastifyInstance> {
   const app = Fastify({ logger: process.env.NODE_ENV === 'production', bodyLimit: 16 * 1024, ajv: { customOptions: { removeAdditional: false } } });
   await app.register(cookie);
+  await registerApiDocs(app);
 
   app.setErrorHandler((error, _request, reply) => {
     if (error && typeof error === 'object' && 'validation' in error) {
@@ -110,9 +112,15 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     return session;
   }
 
-  app.get('/api/health', async () => ({ status: 'ok' }));
+  app.get('/api/health', { schema: {
+    tags: ['Health'], summary: 'Check API process health',
+    response: { 200: { type: 'object', required: ['status'], properties: { status: { type: 'string', enum: ['ok'] } } } },
+  } }, async () => ({ status: 'ok' }));
 
-  app.post<{ Body: Credentials }>('/api/auth/register', { schema: { body: credentialsSchema } }, async (request, reply) => {
+  app.post<{ Body: Credentials }>('/api/auth/register', { schema: {
+    tags: ['Authentication'], summary: 'Create an account', body: credentialsSchema,
+    response: { 201: userResponse, 400: errorResponse, 409: errorResponse },
+  } }, async (request, reply) => {
     const email = request.body.email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       return reply.code(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Enter a valid email address.' } });
@@ -125,7 +133,11 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     return reply.code(201).send({ user: { id: user.id, email: user.email } });
   });
 
-  app.post<{ Body: Credentials }>('/api/auth/login', { schema: { body: credentialsSchema } }, async (request, reply) => {
+  app.post<{ Body: Credentials }>('/api/auth/login', { schema: {
+    tags: ['Authentication'], summary: 'Start a session',
+    description: 'Sets an HttpOnly, SameSite=Strict session cookie and returns the CSRF token for later authenticated mutations.',
+    body: credentialsSchema, response: { 200: loginResponse, 400: errorResponse, 401: errorResponse },
+  } }, async (request, reply) => {
     const email = request.body.email.trim().toLowerCase();
     const user = await store.findUserByEmail(email);
     if (!user || !(await argon2.verify(user.passwordHash, request.body.password))) {
@@ -144,13 +156,19 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     return { user: { id: user.id, email: user.email }, csrfToken };
   });
 
-  app.get('/api/auth/me', async (request, reply) => {
+  app.get('/api/auth/me', { schema: {
+    tags: ['Authentication'], summary: 'Read the current session and CSRF token', security: sessionSecurity,
+    response: { 200: sessionResponse, 401: errorResponse },
+  } }, async (request, reply) => {
     const session = await sessionFor(request, reply);
     if (!session) return;
     return { userId: session.userId, csrfToken: session.csrfToken };
   });
 
-  app.post('/api/auth/logout', async (request, reply) => {
+  app.post('/api/auth/logout', { schema: {
+    tags: ['Authentication'], summary: 'End the current session', security: mutationSecurity,
+    response: { 204: { type: 'null' }, 401: errorResponse, 403: errorResponse },
+  } }, async (request, reply) => {
     const session = await sessionFor(request, reply, true);
     if (!session) return;
     const token = request.cookies[SESSION_COOKIE];
@@ -159,7 +177,10 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     return reply.code(204).send();
   });
 
-  app.post<{ Body: NewTodo }>('/api/todos', { schema: { body: newTodoSchema } }, async (request, reply) => {
+  app.post<{ Body: NewTodo }>('/api/todos', { schema: {
+    tags: ['Tasks'], summary: 'Create a task', security: mutationSecurity, body: newTodoSchema,
+    response: { 201: todoResponse, 400: errorResponse, 401: errorResponse, 403: errorResponse },
+  } }, async (request, reply) => {
     const session = await sessionFor(request, reply, true);
     if (!session) return;
     const title = request.body.title.trim();
@@ -171,13 +192,19 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     return reply.code(201).send({ todo: publicTodo(todo) });
   });
 
-  app.get('/api/todos', async (request, reply) => {
+  app.get('/api/todos', { schema: {
+    tags: ['Tasks'], summary: 'List your tasks', security: sessionSecurity,
+    response: { 200: todosResponse, 401: errorResponse },
+  } }, async (request, reply) => {
     const session = await sessionFor(request, reply);
     if (!session) return;
     return { todos: (await store.listTodos(session.userId)).map(publicTodo) };
   });
 
-  app.get<{ Params: TodoParams }>('/api/todos/:id', async (request, reply) => {
+  app.get<{ Params: TodoParams }>('/api/todos/:id', { schema: {
+    tags: ['Tasks'], summary: 'Read one of your tasks', security: sessionSecurity, params: todoParams,
+    response: { 200: todoResponse, 401: errorResponse, 404: errorResponse },
+  } }, async (request, reply) => {
     const session = await sessionFor(request, reply);
     if (!session) return;
     const todo = UUID_PATTERN.test(request.params.id) ? await store.findTodo(session.userId, request.params.id) : null;
@@ -185,7 +212,11 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     return { todo: publicTodo(todo) };
   });
 
-  app.patch<{ Params: TodoParams; Body: TodoUpdate }>('/api/todos/:id', { schema: { body: updateTodoSchema } }, async (request, reply) => {
+  app.patch<{ Params: TodoParams; Body: TodoUpdate }>('/api/todos/:id', { schema: {
+    tags: ['Tasks'], summary: 'Update task fields or completion', security: mutationSecurity,
+    params: todoParams, body: updateTodoSchema,
+    response: { 200: todoResponse, 400: errorResponse, 401: errorResponse, 403: errorResponse, 404: errorResponse },
+  } }, async (request, reply) => {
     const session = await sessionFor(request, reply, true);
     if (!session) return;
     if (!UUID_PATTERN.test(request.params.id)) {
@@ -204,7 +235,10 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     return { todo: publicTodo(todo) };
   });
 
-  app.delete<{ Params: TodoParams }>('/api/todos/:id', async (request, reply) => {
+  app.delete<{ Params: TodoParams }>('/api/todos/:id', { schema: {
+    tags: ['Tasks'], summary: 'Delete one of your tasks', security: mutationSecurity, params: todoParams,
+    response: { 204: { type: 'null' }, 401: errorResponse, 403: errorResponse, 404: errorResponse },
+  } }, async (request, reply) => {
     const session = await sessionFor(request, reply, true);
     if (!session) return;
     const deleted = UUID_PATTERN.test(request.params.id) && await store.deleteTodo(session.userId, request.params.id);

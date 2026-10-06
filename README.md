@@ -29,9 +29,9 @@ In a second terminal from the repository root:
 npm run dev:frontend
 ```
 
-The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. The frontend listens on `http://localhost:5173` and proxies `/api` to the backend. The local Compose configuration binds PostgreSQL to `127.0.0.1:5433` (container port 5432) and keeps its data in a named volume. If that host port is already used, change the host port and `.env` together.
+The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. Interactive API documentation is at `http://localhost:3000/api/docs/` and its OpenAPI JSON is at `/api/docs/json`. The frontend listens on `http://localhost:5173` and proxies `/api` to the backend. The local Compose configuration binds PostgreSQL to `127.0.0.1:5433` (container port 5432) and keeps its data in a named volume. If that host port is already used, change the host port and `.env` together.
 
-To run both applications as containers instead, use `docker compose up --build --wait -d` and open `http://127.0.0.1:8080`. The [deployment guide](docs/deployment.md) explains the production stack and its separate TLS configuration.
+To run both applications as containers instead, use `docker compose up --build --wait -d` and open `http://127.0.0.1:8080`; Swagger UI is at `http://127.0.0.1:8080/api/docs/`. The [deployment guide](docs/deployment.md) explains the production stack and its separate TLS configuration.
 
 ```bash
 npm run test:backend
