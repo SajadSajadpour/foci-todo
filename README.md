@@ -5,12 +5,40 @@ Foci take-home assessment. This repository will contain two independent applicat
 - `apps/backend`: TypeScript API, authentication, task rules, and PostgreSQL access.
 - `apps/frontend`: React and TypeScript user interface.
 
-The product scope and acceptance criteria are in the [planning document](../Foci%20Todo%20Scope%20and%20Acceptance%20Criteria.md). The [API contract](docs/api-contract.md) and [architecture decisions](docs/architecture.md) are recorded before implementation.
+The product scope and acceptance criteria are in the [planning document](../Foci%20Todo%20Scope%20and%20Acceptance%20Criteria.md). The [API contract](docs/api-contract.md) and [architecture decisions](docs/architecture.md) record the design.
 
 ## Current status
 
-Repository structure and design contract are established. Application code, tests, local setup, and deployment have not been implemented yet. The next step is a working vertical slice: register, sign in, create a task, and list the signed-in user's tasks.
+The backend's first vertical slice is implemented: registration, login, logout, current session, task creation, and task listing. Automated HTTP tests cover validation, CSRF checks, logout, and user isolation. Task detail, update, delete, and the frontend remain to be built.
 
-## Planned local setup
+## Run the backend locally
 
-The completed README will provide exact installation, database migration, run, and test commands. A fresh checkout must work without AWS credentials.
+Requirements: Node.js 22 or later, npm, and Docker with Compose. Docker must be running for the database commands.
+
+```bash
+npm ci
+cp apps/backend/.env.example apps/backend/.env
+docker compose up -d db
+npm run db:migrate -w @foci/backend
+npm run dev:backend
+```
+
+The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. The local Compose configuration binds PostgreSQL to `127.0.0.1:5432` and keeps its data in a named volume. If that port is already used, change the host port and `.env` together.
+
+```bash
+npm run test:backend
+npm run typecheck:backend
+npm run build:backend
+```
+
+The automated tests currently use an in-memory implementation of the storage contract and do not require Docker. Running migrations and checking persistence against a live PostgreSQL instance remains a separate verification step.
+
+## Current design choices
+
+- Fastify handles HTTP and request validation; a storage interface keeps those concerns apart from PostgreSQL access.
+- Drizzle defines the PostgreSQL schema in code and generates a versioned SQL migration.
+- Passwords use Argon2id hashes. Random session tokens are hashed before storage and sent in HttpOnly cookies. State-changing authenticated requests require a per-session CSRF token.
+- The task queries are scoped by the authenticated user ID. The frontend will call the API through the same origin when deployed.
+- Authentication adds product scope beyond the assignment's minimum. Email verification, password recovery, and MFA are outside this assessment build.
+
+The API's remaining task endpoints, frontend, CI, and deployment will be completed in later steps. No AWS credentials are required to run the application locally.

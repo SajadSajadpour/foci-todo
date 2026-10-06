@@ -2,6 +2,8 @@
 
 All endpoints use the `/api` prefix and JSON request and response bodies except logout and delete, which may return `204 No Content`. The browser uses a server-managed session cookie. Task routes require an authenticated session.
 
+**Implementation status:** authentication, create, and list are implemented. View, update, and delete are planned for the next backend step.
+
 | Method | Path | Purpose | Success | Main errors |
 | --- | --- | --- | --- | --- |
 | POST | `/api/auth/register` | Register with email and password | 201 | 400, 409 |
@@ -14,7 +16,7 @@ All endpoints use the `/api` prefix and JSON request and response bodies except 
 | PATCH | `/api/todos/:id` | Update task fields or completion | 200 | 400, 401, 404 |
 | DELETE | `/api/todos/:id` | Delete task | 204 | 401, 404 |
 
-The authentication mechanism and exact request limits will be finalized with the backend implementation. Task IDs are opaque. A task belonging to another user must return `404` to avoid revealing its existence.
+Authentication uses a server-managed session cookie and requires an `X-CSRF-Token` header for authenticated state changes. Login returns the token, and `/api/auth/me` allows the client to retrieve it after a reload. Task IDs are opaque. A task belonging to another user must return `404` to avoid revealing its existence.
 
 ## Task shape
 
