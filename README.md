@@ -5,7 +5,7 @@ Foci take-home assessment. This repository will contain two independent applicat
 - `apps/backend`: TypeScript API, authentication, task rules, and PostgreSQL access.
 - `apps/frontend`: React and TypeScript user interface.
 
-The product scope and acceptance criteria are in the [planning document](../Foci%20Todo%20Scope%20and%20Acceptance%20Criteria.md). The [API contract](docs/api-contract.md) and [architecture decisions](docs/architecture.md) record the design.
+The product scope and acceptance criteria are in the [planning document](../Foci%20Todo%20Scope%20and%20Acceptance%20Criteria.md). The [API contract](docs/api-contract.md), [architecture decisions](docs/architecture.md), and [frontend plan](docs/frontend-plan.md) record the design.
 
 ## Current status
 
