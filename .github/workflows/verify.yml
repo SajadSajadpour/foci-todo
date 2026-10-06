@@ -26,6 +26,9 @@ jobs:
       - run: npm run build:frontend
       - run: PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - run: docker compose --env-file .env.production.example -f compose.production.yaml config --quiet
+      - run: docker compose build backend web
+      - run: docker run --rm -e SITE_DOMAIN=tasks.example.com foci-todo-web:local caddy validate --config /etc/caddy/Caddyfile.production --adapter caddyfile
       - if: failure()
         uses: actions/upload-artifact@v4
         with:

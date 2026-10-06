@@ -78,7 +78,7 @@ function equalToken(actual: string, expected: string): boolean {
 }
 
 export async function buildApp(store: Store): Promise<FastifyInstance> {
-  const app = Fastify({ logger: false, bodyLimit: 16 * 1024, ajv: { customOptions: { removeAdditional: false } } });
+  const app = Fastify({ logger: process.env.NODE_ENV === 'production', bodyLimit: 16 * 1024, ajv: { customOptions: { removeAdditional: false } } });
   await app.register(cookie);
 
   app.setErrorHandler((error, _request, reply) => {

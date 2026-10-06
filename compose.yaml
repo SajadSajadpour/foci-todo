@@ -14,5 +14,45 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    image: foci-todo-backend:local
+    environment:
+      DATABASE_URL: postgres://foci:foci_local_only@db:5432/foci_todo
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["node", "dist/database/migrate.js"]
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    image: foci-todo-backend:local
+    environment:
+      DATABASE_URL: postgres://foci:foci_local_only@db:5432/foci_todo
+      NODE_ENV: development
+      PORT: 3000
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+  web:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    image: foci-todo-web:local
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
 volumes:
   postgres_data:

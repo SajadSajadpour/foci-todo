@@ -5,11 +5,11 @@ Foci take-home assessment. This repository will contain two independent applicat
 - `apps/backend`: TypeScript API, authentication, task rules, and PostgreSQL access.
 - `apps/frontend`: React and TypeScript user interface.
 
-The product scope and acceptance criteria are in the [planning document](../Foci%20Todo%20Scope%20and%20Acceptance%20Criteria.md). The [API contract](docs/api-contract.md), [architecture decisions](docs/architecture.md), [frontend plan](docs/frontend-plan.md), and [Figma UX brief](docs/figma-ux-brief.md) record the design.
+The product scope and acceptance criteria are in the [planning document](../Foci%20Todo%20Scope%20and%20Acceptance%20Criteria.md). The [API contract](docs/api-contract.md), [architecture decisions](docs/architecture.md), [frontend plan](docs/frontend-plan.md), [Figma UX brief](docs/figma-ux-brief.md), and [deployment guide](docs/deployment.md) record the design.
 
 ## Current status
 
-The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, and user isolation. The responsive frontend implements authentication, protected routing, task listing, creation, detail, editing, completion/reopening, and confirmed deletion.
+The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, and user isolation. The responsive frontend implements authentication, protected routing, task listing, creation, detail, editing, completion/reopening, and confirmed deletion. Both applications have Docker images and a local container stack; the production Compose/TLS configuration is prepared but not deployed.
 
 ## Run locally
 
@@ -30,6 +30,8 @@ npm run dev:frontend
 ```
 
 The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. The frontend listens on `http://localhost:5173` and proxies `/api` to the backend. The local Compose configuration binds PostgreSQL to `127.0.0.1:5433` (container port 5432) and keeps its data in a named volume. If that host port is already used, change the host port and `.env` together.
+
+To run both applications as containers instead, use `docker compose up --build --wait -d` and open `http://127.0.0.1:8080`. The [deployment guide](docs/deployment.md) explains the production stack and its separate TLS configuration.
 
 ```bash
 npm run test:backend
@@ -56,4 +58,4 @@ The backend tests use an in-memory implementation of the storage contract and do
 - The task queries are scoped by the authenticated user ID. The frontend calls relative `/api` URLs so it can use the same origin when deployed.
 - Authentication adds product scope beyond the assignment's minimum. Email verification, password recovery, and MFA are outside this assessment build.
 
-Deployment and production configuration will be completed in later steps. No AWS credentials are required to run the application locally.
+No AWS credentials are required to run the application locally. Provisioning an EC2 host, attaching a domain, issuing a public certificate, and checking the deployed service remain separate steps.
