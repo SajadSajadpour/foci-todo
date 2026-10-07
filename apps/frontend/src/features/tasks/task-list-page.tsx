@@ -13,9 +13,15 @@ import { formatCalendarDate } from './date-format';
 import { todoApi } from './todo-api';
 import type { Todo, TodoSort, TodoStatus } from './todo-api';
 
-function NewTaskLink() {
-  return <Link className="button button-primary new-task-link" to={routes.newTask}><img src={plusIcon} alt="" />New task</Link>;
+function NewTaskLink({ firstTask = false }: { firstTask?: boolean }) {
+  return <Link className="button button-primary new-task-link" to={routes.newTask}><img src={plusIcon} alt="" />{firstTask ? 'Create your first task' : 'New task'}</Link>;
 }
+
+const statusOptions: { value: TodoStatus; label: string }[] = [
+  { value: 'all', label: 'All tasks' },
+  { value: 'active', label: 'Incomplete' },
+  { value: 'completed', label: 'Completed' },
+];
 
 function TaskRow({ todo, pending, onCompletion }: {
   todo: Todo;
@@ -113,6 +119,16 @@ export function TaskListPage() {
     }
   }
 
+  const firstUse = !loading && !loadError && status === 'all' && todos?.length === 0;
+  const resultCount = pagination.total === 0
+    ? `0 ${status === 'all' ? 'tasks' : `${status === 'active' ? 'incomplete' : 'completed'} tasks`}`
+    : `Showing ${(pagination.page - 1) * pagination.pageSize + 1}–${Math.min(pagination.page * pagination.pageSize, pagination.total)} of ${pagination.total} ${pagination.total === 1 ? 'task' : 'tasks'}`;
+
+  function showAllTasks() {
+    setStatus('all');
+    setPage(1);
+  }
+
   return (
     <main className="tasks-main">
       <div className="tasks-column">
@@ -121,16 +137,20 @@ export function TaskListPage() {
           <NewTaskLink />
         </div>
 
-        <div className="task-list-controls" aria-label="Task list controls">
-          <div className="task-list-control">
-            <label htmlFor="task-status-filter">Show</label>
-            <select id="task-status-filter" value={status} onChange={(event) => { setStatus(event.target.value as TodoStatus); setPage(1); }}>
-              <option value="all">All tasks</option>
-              <option value="active">Incomplete</option>
-              <option value="completed">Completed</option>
-            </select>
+        {!firstUse && <div className="task-list-controls" aria-label="Task list controls">
+          <div className="task-status-control" role="group" aria-label="Filter tasks by status">
+            <span className="task-control-label">Status</span>
+            <div className="task-status-options">
+              {statusOptions.map((option) => <button
+                key={option.value}
+                type="button"
+                aria-pressed={status === option.value}
+                className={`task-status-option${status === option.value ? ' is-selected' : ''}`}
+                onClick={() => { setStatus(option.value); setPage(1); }}
+              >{option.label}</button>)}
+            </div>
           </div>
-          <div className="task-list-control">
+          <div className="task-sort-control">
             <label htmlFor="task-sort">Sort by</label>
             <select id="task-sort" value={sort} onChange={(event) => { setSort(event.target.value as TodoSort); setPage(1); }}>
               <option value="newest">Newest first</option>
@@ -139,28 +159,31 @@ export function TaskListPage() {
               <option value="title">Title A–Z</option>
             </select>
           </div>
-        </div>
+        </div>}
 
         {actionError && <div className="tasks-feedback"><ErrorMessage>{actionError}</ErrorMessage></div>}
         {loading && <div className="task-skeleton" role="status" aria-label="Loading tasks">
           {[0, 1, 2].map((item) => <div className="task-skeleton-row" key={item}><span /><div><span /><span /></div></div>)}
         </div>}
         {!loading && loadError && <div className="tasks-load-error"><ErrorMessage>{loadError}</ErrorMessage><button className="button button-secondary" onClick={() => setReloadVersion((current) => current + 1)}>Try again</button></div>}
-        {!loading && !loadError && todos?.length === 0 && <div className="tasks-empty">
-          {status === 'all' ? <>
-            <h2>A little more focus.</h2>
-            <p>Your task list is ready. Start with one thing you want to get done.</p>
-            <NewTaskLink />
+        {!loading && !loadError && todos && !firstUse && <div className="task-results-bar">
+          <p className="task-results-summary" role="status">{resultCount}</p>
+          {status !== 'all' && <button className="text-action task-reset-filter" type="button" onClick={showAllTasks}>Show all tasks</button>}
+        </div>}
+        {!loading && !loadError && todos?.length === 0 && <div className={`tasks-empty${firstUse ? ' is-first-use' : ' is-filtered'}`}>
+          {firstUse ? <>
+            <h2>Your list starts here.</h2>
+            <p>No tasks yet. Add your first one, whether it’s a small errand or something you want to make time for.</p>
+            <NewTaskLink firstTask />
           </> : <>
-            <h2>No matching tasks.</h2>
-            <p>{status === 'completed' ? 'Completed tasks will appear here.' : 'No incomplete tasks right now.'}</p>
-            <button className="button button-secondary" type="button" onClick={() => { setStatus('all'); setPage(1); }}>Show all tasks</button>
+            <h2>{status === 'completed' ? 'No completed tasks yet.' : 'No incomplete tasks right now.'}</h2>
+            <p>{status === 'completed'
+              ? 'Tasks you complete will appear here. Show all tasks to see your full list.'
+              : 'Show all tasks to see everything on your list.'}</p>
+            <button className="button button-primary" type="button" onClick={showAllTasks}>Show all tasks</button>
           </>}
         </div>}
         {!loading && !loadError && todos && todos.length > 0 && <>
-          <p className="task-results-summary" role="status">
-            Showing {(pagination.page - 1) * pagination.pageSize + 1}–{Math.min(pagination.page * pagination.pageSize, pagination.total)} of {pagination.total} {pagination.total === 1 ? 'task' : 'tasks'}
-          </p>
           <ul className="task-list">{todos.map((todo) => <TaskRow key={todo.id} todo={todo} pending={pendingId === todo.id} onCompletion={(item) => void handleCompletion(item)} />)}</ul>
           {pagination.totalPages > 1 && <nav className="task-pagination" aria-label="Task pages">
             <button className="button button-secondary" type="button" disabled={pagination.page <= 1} onClick={() => setPage((current) => current - 1)}>Previous</button>

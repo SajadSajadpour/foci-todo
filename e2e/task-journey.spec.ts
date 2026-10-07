@@ -33,10 +33,10 @@ test('a user can create, edit, complete, and delete a task', async ({ page }) =>
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page.getByRole('heading', { name: 'My tasks' })).toBeVisible();
-  await expect(page.getByText('Your task list is ready.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your list starts here.' })).toBeVisible();
   await expectAccessible(page);
 
-  await page.getByRole('link', { name: 'New task' }).first().click();
+  await page.getByRole('link', { name: 'Create your first task' }).click();
   await page.getByRole('textbox', { name: 'Title (required)' }).fill('Plan client handoff');
   await page.getByRole('textbox', { name: 'Description (optional)' }).fill('Draft a clear handoff note.');
   await page.getByLabel('Due date (optional)').fill('2026-10-15');
@@ -82,7 +82,7 @@ test('a user can create, edit, complete, and delete a task', async ({ page }) =>
   await page.getByRole('button', { name: 'Delete task' }).click();
   await dialog.getByRole('button', { name: 'Delete task' }).click();
   await expect(page.getByRole('heading', { name: 'My tasks' })).toBeVisible();
-  await expect(page.getByText('Your task list is ready.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your list starts here.' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
 
@@ -127,12 +127,23 @@ test('task filters, sort order, and pagination use the persisted task list', asy
   await expect(page.getByText('Page 1 of 2')).toBeVisible();
   await expect(page.locator('.task-row-title').first()).toHaveText('Task 02');
 
-  await page.getByLabel('Show').selectOption('completed');
+  await page.getByRole('button', { name: 'Completed', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Completed', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.task-row')).toHaveCount(2);
   await expect(page.locator('.task-row-title').first()).toHaveText('Task 02');
   await expect(page.getByText('Showing 1–2 of 2 tasks')).toBeVisible();
-  await page.getByLabel('Show').selectOption('active');
+  await page.getByRole('button', { name: 'Incomplete', exact: true }).click();
   await expect(page.locator('.task-row')).toHaveCount(20);
   await expect(page.getByText('Showing 1–20 of 23 tasks')).toBeVisible();
   await expect(page.getByText('Page 1 of 2')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Completed', exact: true }).click();
+  await page.getByRole('button', { name: /^Reopen:/ }).first().click();
+  await page.getByRole('button', { name: /^Reopen:/ }).click();
+  await expect(page.getByRole('heading', { name: 'No completed tasks yet.' })).toBeVisible();
+  await expect(page.getByText('0 completed tasks')).toBeVisible();
+  await expectAccessible(page);
+  await page.locator('.tasks-empty').getByRole('button', { name: 'Show all tasks' }).click();
+  await expect(page.getByRole('button', { name: 'All tasks', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.task-row')).toHaveCount(20);
 });
