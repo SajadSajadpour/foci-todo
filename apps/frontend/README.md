@@ -4,7 +4,7 @@ React, TypeScript, and Vite application for Foci Tasks. The [Figma design](https
 
 ## Current status
 
-Sign-in, registration, session restoration, sign-out, API error handling, and protected routing are implemented. The task list, create/edit forms, detail page, completion/reopening, and confirmed deletion are wired to the API. The UI includes loading, empty, validation, and failure states.
+Sign-in, registration, session restoration, sign-out, API error handling, and protected routing are implemented. The task list supports server-side status filtering, sorting, and pagination. Create/edit forms, detail page, completion/reopening, and confirmed deletion are wired to the API. The UI includes loading, empty, validation, and failure states.
 
 ## Run
 

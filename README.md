@@ -9,7 +9,7 @@ The product scope and acceptance criteria are in the [planning document](../Foci
 
 ## Current status
 
-The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, and user isolation. The responsive frontend implements authentication, protected routing, task listing, creation, detail, editing, completion/reopening, and confirmed deletion. Both applications have Docker images and a local container stack; the production Compose/TLS configuration is prepared but not deployed.
+The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Task listing supports status filtering, stable sorting, and 20-item server-side pages. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, pagination, and user isolation. The responsive frontend implements authentication, protected routing, task listing, creation, detail, editing, completion/reopening, and confirmed deletion. Both applications have Docker images and a local container stack; the production Compose/TLS configuration is prepared but not deployed.
 
 ## Run locally
 
@@ -64,7 +64,7 @@ The backend tests use an in-memory implementation of the storage contract and do
 - Accounts and private task lists are an added product choice; the assignment itself permits a simpler single-user application. Each account sees only its own tasks.
 - A due date is an optional calendar date in `YYYY-MM-DD` format. Past dates are valid, and no timezone conversion is applied. The server sets task IDs and creation timestamps.
 - PostgreSQL provides persistence across application and database-container restarts when its named volume is retained. Removing that volume deletes local data.
-- Filtering and sorting controls are optional in the brief and are not part of this implementation. The API returns tasks newest first.
+- Filtering and sorting controls are optional in the brief and implemented here. The API defaults to newest first and returns at most 20 tasks per page. Offset pagination keeps this assessment's expected list sizes bounded; a cursor would be preferable for very deep lists or frequently changing large datasets.
 - The production configuration is prepared but has not been deployed. A public endpoint, real certificate, backups, and recovery verification require an EC2 host and domain.
 
 No AWS credentials are required to run the application locally. Provisioning an EC2 host, attaching a domain, issuing a public certificate, and checking the deployed service remain separate steps.

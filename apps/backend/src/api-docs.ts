@@ -87,8 +87,14 @@ export const sessionResponse = {
 export const todoResponse = { type: 'object', required: ['todo'], properties: { todo: todoSchema } } as const;
 export const todosResponse = {
   type: 'object',
-  required: ['todos'],
-  properties: { todos: { type: 'array', items: todoSchema } },
+  required: ['todos', 'total', 'page', 'pageSize', 'totalPages'],
+  properties: {
+    todos: { type: 'array', items: todoSchema },
+    total: { type: 'integer', minimum: 0 },
+    page: { type: 'integer', minimum: 1 },
+    pageSize: { type: 'integer', minimum: 1 },
+    totalPages: { type: 'integer', minimum: 1 },
+  },
 } as const;
 export const todoParams = {
   type: 'object',

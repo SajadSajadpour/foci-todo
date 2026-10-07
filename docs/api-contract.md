@@ -12,12 +12,14 @@ All endpoints use the `/api` prefix and JSON request and response bodies except 
 | POST | `/api/auth/logout` | End the current session | 204 | 401, 403 |
 | GET | `/api/auth/me` | Read current user | 200 | 401 |
 | POST | `/api/todos` | Create task | 201 | 400, 401, 403 |
-| GET | `/api/todos` | List current user's tasks | 200 | 401 |
+| GET | `/api/todos` | List current user's tasks with filtering, sorting, and pagination | 200 | 400, 401 |
 | GET | `/api/todos/:id` | Read current user's task | 200 | 401, 404 |
 | PATCH | `/api/todos/:id` | Update task fields or completion | 200 | 400, 401, 403, 404 |
 | DELETE | `/api/todos/:id` | Delete task | 204 | 401, 403, 404 |
 
 Authentication uses a server-managed session cookie and requires an `X-CSRF-Token` header for authenticated state changes. Login returns the token, and `/api/auth/me` allows the client to retrieve it after a reload. Task IDs are opaque. A task belonging to another user must return `404` to avoid revealing its existence.
+
+`GET /api/todos` accepts `status=all|active|completed`, `sort=newest|oldest|dueSoon|title`, and a one-based `page` (defaults: `all`, `newest`, `1`). Responses contain up to 20 tasks plus `total`, `page`, `pageSize`, and `totalPages`. Pages beyond the end resolve to the last available page. Sorting uses a task ID tie-breaker for stable pages; `dueSoon` puts undated tasks last. The list is scoped to the authenticated user before filtering or counting.
 
 To try protected routes in Swagger UI, use `POST /api/auth/login` in the same browser to set the session cookie. Copy the returned `csrfToken` into the `X-CSRF-Token` authorization field before trying logout, create, update, or delete. The browser sends the HttpOnly cookie automatically.
 

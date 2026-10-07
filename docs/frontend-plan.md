@@ -4,7 +4,7 @@
 
 Build a small, polished React and TypeScript interface for the implemented `/api` contract. The primary journey is register, sign in, create a task, find it in the list, open it, edit it, mark it complete or incomplete, and delete it. The UI must work at mobile and desktop widths and make loading, empty, validation, and failure states clear.
 
-Keep the product focused. Do not add projects, teams, AI assistants, recurring tasks, notifications, priority, or server-side search: none exist in the current API. A list-level filter for all, active, and completed can be client-side if it improves usability after the core journey works.
+Keep the product focused. Do not add projects, teams, AI assistants, recurring tasks, notifications, priority, or server-side search: none exist in the current API. The implemented list filters, sorts, and paginates through the backend so the browser does not load every task at once.
 
 ## Screens and behavior
 

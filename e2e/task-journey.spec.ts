@@ -85,3 +85,54 @@ test('a user can create, edit, complete, and delete a task', async ({ page }) =>
   await expect(page.getByText('Your task list is ready.')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
+
+test('task filters, sort order, and pagination use the persisted task list', async ({ page }) => {
+  const email = `e2e-list-${randomUUID()}@example.com`;
+  const password = 'LocalE2ePassword123!';
+  const registration = await page.request.post('/api/auth/register', { data: { email, password } });
+  expect(registration.status()).toBe(201);
+  const login = await page.request.post('/api/auth/login', { data: { email, password } });
+  expect(login.status()).toBe(200);
+  const { csrfToken } = await login.json();
+  const ids: string[] = [];
+
+  for (let number = 1; number <= 25; number += 1) {
+    const response = await page.request.post('/api/todos', {
+      headers: { 'X-CSRF-Token': csrfToken },
+      data: {
+        title: `Task ${String(number).padStart(2, '0')}`,
+        dueDate: number === 1 ? '2026-10-20' : number === 2 ? '2026-10-11' : null,
+      },
+    });
+    expect(response.status()).toBe(201);
+    ids.push((await response.json()).todo.id);
+  }
+  for (const id of ids.slice(0, 2)) {
+    const response = await page.request.patch(`/api/todos/${id}`, {
+      headers: { 'X-CSRF-Token': csrfToken }, data: { isCompleted: true },
+    });
+    expect(response.status()).toBe(200);
+  }
+
+  await page.goto('/tasks');
+  await expect(page.getByRole('heading', { name: 'My tasks' })).toBeVisible();
+  await expect(page.locator('.task-row')).toHaveCount(20);
+  await expect(page.getByText('Showing 1–20 of 25 tasks')).toBeVisible();
+  await expectAccessible(page);
+
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.locator('.task-row')).toHaveCount(5);
+  await expect(page.getByText('Page 2 of 2')).toBeVisible();
+  await page.getByLabel('Sort by').selectOption('dueSoon');
+  await expect(page.getByText('Page 1 of 2')).toBeVisible();
+  await expect(page.locator('.task-row-title').first()).toHaveText('Task 02');
+
+  await page.getByLabel('Show').selectOption('completed');
+  await expect(page.locator('.task-row')).toHaveCount(2);
+  await expect(page.locator('.task-row-title').first()).toHaveText('Task 02');
+  await expect(page.getByText('Showing 1–2 of 2 tasks')).toBeVisible();
+  await page.getByLabel('Show').selectOption('active');
+  await expect(page.locator('.task-row')).toHaveCount(20);
+  await expect(page.getByText('Showing 1–20 of 23 tasks')).toBeVisible();
+  await expect(page.getByText('Page 1 of 2')).toBeVisible();
+});

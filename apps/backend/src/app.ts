@@ -5,6 +5,8 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { errorResponse, loginResponse, mutationSecurity, registerApiDocs, sessionResponse, sessionSecurity, todoParams, todoResponse, todosResponse, userResponse } from './api-docs.js';
 import type { Session, Store, Todo } from './features/types.js';
+import { TODO_SORTS, TODO_STATUSES } from './features/todo-list.js';
+import type { TodoListOptions } from './features/todo-list.js';
 
 const SESSION_COOKIE = 'foci_session';
 const SESSION_SECONDS = 7 * 24 * 60 * 60;
@@ -47,6 +49,16 @@ const updateTodoSchema = {
     description: { type: 'string', nullable: true, maxLength: DESCRIPTION_MAX },
     dueDate: { type: 'string', nullable: true, description: 'Valid calendar date in YYYY-MM-DD format, or null.' },
     isCompleted: { type: 'boolean' },
+  },
+} as const;
+
+const todoListQuerySchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    status: { type: 'string', enum: [...TODO_STATUSES], default: 'all', description: 'Filter by completion status.' },
+    sort: { type: 'string', enum: [...TODO_SORTS], default: 'newest', description: 'Stable order; tasks without due dates come last for dueSoon.' },
+    page: { type: 'integer', minimum: 1, maximum: 1000000, default: 1, description: 'One-based page number. Out-of-range pages resolve to the last available page.' },
   },
 } as const;
 
@@ -192,13 +204,15 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     return reply.code(201).send({ todo: publicTodo(todo) });
   });
 
-  app.get('/api/todos', { schema: {
+  app.get<{ Querystring: TodoListOptions }>('/api/todos', { schema: {
     tags: ['Tasks'], summary: 'List your tasks', security: sessionSecurity,
-    response: { 200: todosResponse, 401: errorResponse },
+    querystring: todoListQuerySchema,
+    response: { 200: todosResponse, 400: errorResponse, 401: errorResponse },
   } }, async (request, reply) => {
     const session = await sessionFor(request, reply);
     if (!session) return;
-    return { todos: (await store.listTodos(session.userId)).map(publicTodo) };
+    const result = await store.listTodos(session.userId, request.query);
+    return { ...result, todos: result.todos.map(publicTodo) };
   });
 
   app.get<{ Params: TodoParams }>('/api/todos/:id', { schema: {

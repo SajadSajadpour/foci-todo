@@ -9,8 +9,14 @@
 .tasks-introduction p { margin: 12px 0 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
 .new-task-link { gap: 8px; flex: none; text-decoration: none; }
 .new-task-link img { width: 18px; height: 18px; }
+.task-list-controls { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; margin-top: 32px; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.task-list-control { display: flex; flex: 1 1 220px; flex-direction: column; gap: 8px; }
+.task-list-control label { color: var(--muted); font-size: 12px; line-height: 18px; font-weight: 600; }
+.task-list-control select { width: 100%; min-height: 44px; padding: 10px 36px 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; }
+.task-list-control select:hover { border-color: #98a69f; }
+.task-results-summary { margin: 28px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; }
 .tasks-feedback { margin-top: 24px; }
-.task-list { list-style: none; padding: 0; margin: 32px 0 0; border-top: 1px solid var(--border); }
+.task-list { list-style: none; padding: 0; margin: 16px 0 0; border-top: 1px solid var(--border); }
 .task-row { border-bottom: 1px solid var(--border); padding: 16px 12px; display: flex; align-items: flex-start; gap: 16px; }
 .task-row:hover { background: rgba(232, 239, 235, 0.4); }
 .completion-control { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 2px solid transparent; border-radius: 6px; background: transparent; padding: 0; }
@@ -29,6 +35,9 @@
 .status-label img { width: 14px; height: 14px; }
 .task-row-chevron { width: 16px; height: 16px; flex: none; margin: 14px 4px; }
 .tasks-help { margin: 28px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.task-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; }
+.task-pagination span { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.task-pagination .button:disabled { opacity: 0.5; }
 .tasks-empty { border-top: 1px solid var(--border); margin-top: 32px; padding: 80px 24px; display: flex; flex-direction: column; align-items: flex-start; }
 .tasks-empty h2 { margin: 0; font-family: Lora, Georgia, serif; font-size: 30px; font-weight: 400; line-height: 1.25; }
 .tasks-empty p { max-width: 440px; color: var(--muted); font-size: 16px; line-height: 1.6; margin: 12px 0 24px; }
@@ -93,7 +102,11 @@
   .tasks-introduction { align-items: stretch; flex-direction: column; gap: 24px; }
   .tasks-introduction h1, .task-form-introduction h1, .task-detail-column h1 { font-size: 30px; }
   .new-task-link { width: 100%; }
-  .task-list { margin-top: 32px; }
+  .task-list-controls { margin-top: 24px; padding: 16px; gap: 16px; }
+  .task-list-control { flex-basis: 100%; }
+  .task-list { margin-top: 16px; }
+  .task-pagination { gap: 8px; }
+  .task-pagination .button { min-width: 0; padding: 10px 12px; }
   .task-row { gap: 8px; padding: 16px 0; }
   .task-row-main { padding-top: 9px; }
   .task-row-title { font-size: 16px; line-height: 1.45; }

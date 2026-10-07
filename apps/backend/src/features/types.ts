@@ -30,8 +30,9 @@ export interface Store {
   findSession(tokenHash: string): Promise<Session | null>;
   deleteSession(tokenHash: string): Promise<void>;
   createTodo(userId: string, title: string, description: string | null, dueDate: string | null): Promise<Todo>;
-  listTodos(userId: string): Promise<Todo[]>;
+  listTodos(userId: string, options: TodoListOptions): Promise<TodoListResult<Todo>>;
   findTodo(userId: string, id: string): Promise<Todo | null>;
   updateTodo(userId: string, id: string, changes: TodoChanges): Promise<Todo | null>;
   deleteTodo(userId: string, id: string): Promise<boolean>;
 }
+import type { TodoListOptions, TodoListResult } from './todo-list.js';

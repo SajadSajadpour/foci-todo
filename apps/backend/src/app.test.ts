@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { buildApp } from './app.js';
 import type { Session, Store, Todo, User } from './features/types.js';
+import { TODO_PAGE_SIZE } from './features/todo-list.js';
 
 function memoryStore(): Store {
   const users = new Map<string, User>();
@@ -27,7 +28,28 @@ function memoryStore(): Store {
       todos.set(todo.id, todo);
       return todo;
     },
-    async listTodos(userId) { return [...todos.values()].filter((todo) => todo.userId === userId); },
+    async listTodos(userId, options) {
+      const filtered = [...todos.values()].filter((todo) =>
+        todo.userId === userId && (options.status === 'all' || todo.isCompleted === (options.status === 'completed')),
+      );
+      filtered.sort((left, right) => {
+        if (options.sort === 'title') return left.title.toLowerCase().localeCompare(right.title.toLowerCase()) || left.id.localeCompare(right.id);
+        if (options.sort === 'dueSoon') {
+          if (left.dueDate === null) return right.dueDate === null ? left.id.localeCompare(right.id) : 1;
+          if (right.dueDate === null) return -1;
+          return left.dueDate.localeCompare(right.dueDate) || left.id.localeCompare(right.id);
+        }
+        const order = left.createdAt.getTime() - right.createdAt.getTime() || left.id.localeCompare(right.id);
+        return options.sort === 'oldest' ? order : -order;
+      });
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / TODO_PAGE_SIZE));
+      const page = Math.min(options.page, totalPages);
+      return {
+        todos: filtered.slice((page - 1) * TODO_PAGE_SIZE, page * TODO_PAGE_SIZE),
+        total, page, pageSize: TODO_PAGE_SIZE, totalPages,
+      };
+    },
     async findTodo(userId, id) {
       const todo = todos.get(id);
       return todo?.userId === userId ? todo : null;
@@ -78,6 +100,8 @@ describe('account and first task slice', () => {
       expect(spec.paths['/api/auth/login'].post.responses['200'].content['application/json'].schema.properties).toHaveProperty('csrfToken');
       expect(spec.paths['/api/auth/me'].get.security).toEqual([{ sessionCookie: [] }]);
       expect(spec.paths['/api/todos'].post.security).toEqual([{ sessionCookie: [], csrfToken: [] }]);
+      expect(spec.paths['/api/todos'].get.parameters.map((parameter: { name: string }) => parameter.name)).toEqual(['status', 'sort', 'page']);
+      expect(spec.paths['/api/todos'].get.responses['200'].content['application/json'].schema.required).toContain('totalPages');
       expect(spec.paths['/api/todos/{id}'].patch.security).toEqual([{ sessionCookie: [], csrfToken: [] }]);
       expect(spec.components.securitySchemes.sessionCookie.name).toBe('foci_session');
       expect(spec.components.securitySchemes.csrfToken.name).toBe('X-CSRF-Token');
@@ -109,6 +133,49 @@ describe('account and first task slice', () => {
 
       const anonymousList = await app.inject({ method: 'GET', url: '/api/todos' });
       expect(anonymousList.statusCode).toBe(401);
+    } finally {
+      await app.close();
+    }
+  });
+
+  it('filters, sorts, and bounds paginated task results per user', async () => {
+    const app = await buildApp(memoryStore());
+    try {
+      const alice = await signIn(app, 'alice@example.com');
+      const bob = await signIn(app, 'bob@example.com');
+      const headers = { cookie: alice.cookie, 'x-csrf-token': alice.csrf };
+      for (let number = 1; number <= 23; number += 1) {
+        const create = await app.inject({ method: 'POST', url: '/api/todos', headers,
+          payload: { title: `Task ${String(number).padStart(2, '0')}`, dueDate: number <= 2 ? `2026-10-${String(number + 10)}` : null },
+        });
+        expect(create.statusCode).toBe(201);
+        if (number <= 2) {
+          const complete = await app.inject({ method: 'PATCH', url: `/api/todos/${create.json().todo.id}`, headers, payload: { isCompleted: true } });
+          expect(complete.statusCode).toBe(200);
+        }
+      }
+
+      const get = (query = '') => app.inject({ method: 'GET', url: `/api/todos${query}`, headers: { cookie: alice.cookie } });
+      const first = (await get()).json();
+      expect(first).toMatchObject({ total: 23, page: 1, pageSize: 20, totalPages: 2 });
+      expect(first.todos).toHaveLength(20);
+      const second = (await get('?page=2')).json();
+      expect(second.todos).toHaveLength(3);
+      expect(new Set([...first.todos, ...second.todos].map((todo: Todo) => todo.id)).size).toBe(23);
+
+      const completed = (await get('?status=completed&sort=title')).json();
+      expect(completed.todos.map((todo: Todo) => todo.title)).toEqual(['Task 01', 'Task 02']);
+      expect(completed.total).toBe(2);
+      const activeLastPage = (await get('?status=active&sort=title&page=2')).json();
+      expect(activeLastPage).toMatchObject({ total: 21, page: 2, totalPages: 2 });
+      expect(activeLastPage.todos.map((todo: Todo) => todo.title)).toEqual(['Task 23']);
+      expect((await get('?sort=dueSoon')).json().todos.slice(0, 2).map((todo: Todo) => todo.title)).toEqual(['Task 01', 'Task 02']);
+      expect((await get('?status=completed&page=99')).json().page).toBe(1);
+      for (const query of ['?status=unknown', '?sort=unknown', '?page=0', '?page=1.5', '?page=1000001', '?extra=1']) {
+        expect((await get(query)).statusCode).toBe(400);
+      }
+      const bobList = await app.inject({ method: 'GET', url: '/api/todos', headers: { cookie: bob.cookie } });
+      expect(bobList.json()).toMatchObject({ todos: [], total: 0, page: 1, totalPages: 1 });
     } finally {
       await app.close();
     }
