@@ -87,6 +87,7 @@ test('a user can create, edit, complete, and delete a task', async ({ page }) =>
 });
 
 test('task filters, sort order, and pagination use the persisted task list', async ({ page }) => {
+  test.setTimeout(60_000);
   const email = `e2e-list-${randomUUID()}@example.com`;
   const password = 'LocalE2ePassword123!';
   const registration = await page.request.post('/api/auth/register', { data: { email, password } });

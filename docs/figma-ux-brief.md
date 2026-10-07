@@ -12,7 +12,7 @@ The app helps one signed-in person manage their private to-do tasks. The complet
 
 1. Register an account with email and password.
 2. Sign in.
-3. See their task list and create a task.
+3. See their paginated task list, filter by completion status, choose a sort order, and create a task.
 4. Open a task to read all its details.
 5. Edit its title, description, or due date.
 6. Mark it complete or reopen it.
@@ -45,7 +45,7 @@ Email, password, and confirm-password fields; clear guidance that the password m
 
 ### 3. Populated task list
 
-App identity, “My tasks” heading, clear “New task” action, sign-out action, and an easy-to-scan list with realistic tasks. Each row shows title, due date when present, and completion state. Some tasks have no due date; some are complete. Make the whole list usable at a glance and make the task title/row obviously openable. Show what happens when a user completes or reopens a task. Avoid fake counters or filters unless they can be derived entirely from the currently loaded task list; the core UI should not depend on them.
+App identity, “My tasks” heading, clear “New task” action, sign-out action, and an easy-to-scan list with realistic tasks. Each row shows title, due date when present, and completion state. Some tasks have no due date; some are complete. Make the whole list usable at a glance and make the task title/row obviously openable. Show what happens when a user completes or reopens a task. The implemented list has server-side status filtering (All tasks, Incomplete, Completed), sorting (Newest first, Oldest first, Due date, soonest, Title A–Z), and 20-item pagination. Show accurate server-provided result counts; do not derive totals from only the visible page. The detailed control and empty-state design is in `figma-filter-sort-ux-prompt.md`.
 
 ### 4. Empty task list
 
