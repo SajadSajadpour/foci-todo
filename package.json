@@ -8,6 +8,7 @@
   "scripts": {
     "dev:backend": "npm run dev -w @foci/backend",
     "test:backend": "npm run test -w @foci/backend",
+    "test:postgres": "node scripts/test-postgres.mjs",
     "typecheck:backend": "npm run typecheck -w @foci/backend",
     "build:backend": "npm run build -w @foci/backend",
     "dev:frontend": "npm run dev -w @foci/frontend",

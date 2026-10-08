@@ -4,6 +4,7 @@ import Fastify from 'fastify';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { errorResponse, loginResponse, mutationSecurity, registerApiDocs, sessionResponse, sessionSecurity, todoParams, todoResponse, todosResponse, userResponse } from './api-docs.js';
+import { isValidCalendarDate } from './features/calendar-date.js';
 import type { Session, Store, Todo } from './features/types.js';
 import { TODO_SORTS, TODO_STATUSES } from './features/todo-list.js';
 import type { TodoListOptions } from './features/todo-list.js';
@@ -75,13 +76,6 @@ function publicTodo(todo: Todo) {
 
 function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
-}
-
-function validDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const [year, month, day] = value.split('-').map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
 }
 
 function equalToken(actual: string, expected: string): boolean {
@@ -197,7 +191,7 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     if (!session) return;
     const title = request.body.title.trim();
     const dueDate = request.body.dueDate ?? null;
-    if (!title || (dueDate !== null && !validDate(dueDate))) {
+    if (!title || (dueDate !== null && !isValidCalendarDate(dueDate))) {
       return reply.code(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Provide a title and a valid due date.' } });
     }
     const todo = await store.createTodo(session.userId, title, request.body.description ?? null, dueDate);
@@ -241,7 +235,7 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
       changes.title = changes.title.trim();
       if (!changes.title) return reply.code(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Title cannot be blank.' } });
     }
-    if (changes.dueDate !== undefined && changes.dueDate !== null && !validDate(changes.dueDate)) {
+    if (changes.dueDate !== undefined && changes.dueDate !== null && !isValidCalendarDate(changes.dueDate)) {
       return reply.code(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Provide a valid due date.' } });
     }
     const todo = await store.updateTodo(session.userId, request.params.id, changes);

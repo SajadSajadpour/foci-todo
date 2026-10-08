@@ -45,12 +45,14 @@ To run both applications as containers instead, use `docker compose up --build -
 | --- | --- |
 | [`apps/backend/.env.example`](apps/backend/.env.example) | Local API database connection and port template. |
 | [`compose.yaml`](compose.yaml) | Loopback-only local web and database stack with migration step. |
+| [`compose.test.yaml`](compose.test.yaml) | Disposable PostgreSQL instance for integration tests; separate from the development stack. |
 | [`.env.production.example`](.env.production.example) and [`compose.production.yaml`](compose.production.yaml) | Production values and service topology; replace example secrets before deployment. |
 | [`apps/frontend/Caddyfile.production`](apps/frontend/Caddyfile.production) | HTTPS/TLS 1.3, same-origin API proxy, and security headers. |
 | [`.github/workflows/verify.yml`](.github/workflows/verify.yml) | Push and pull-request verification. |
 
 ```bash
 npm run test:backend
+npm run test:postgres
 npm run typecheck:backend
 npm run build:backend
 npm run typecheck:frontend
@@ -64,9 +66,9 @@ npm run test:e2e:install
 npm run test:e2e
 ```
 
-The backend tests use an in-memory implementation of the storage contract and do not require Docker. The browser tests start the Compose database, run migrations, and start the API and UI when needed. They use unique local test accounts and check task CRUD, responsive overflow, form/dialog behavior, and WCAG 2.0/2.1 A and AA rules with axe. GitHub Actions runs these checks on pushes and pull requests. The test suite does not reset your database; keep the local Compose database for development and repeat checks in each deployment environment.
+The backend test command runs focused calendar-date unit cases and API tests against an in-memory implementation of the storage contract; it does not require Docker. `npm run test:postgres` starts a separate, disposable PostgreSQL container on loopback port 5434, migrates it, checks real database ownership, filtering, sorting, pagination, and persistence across a connection restart, then removes the test container. It never uses the development database. The browser tests start the development Compose database, run migrations, and start the API and UI when needed. They use unique local test accounts and check task CRUD, responsive overflow, form/dialog behavior, and WCAG 2.0/2.1 A and AA rules with axe. GitHub Actions runs these checks on pushes and pull requests. The browser suite does not reset your development database; keep the local Compose database for development and repeat checks in each deployment environment.
 
-The [CI workflow](.github/workflows/verify.yml) runs type checks, backend tests, frontend and backend builds, desktop/mobile browser tests, production Compose validation, Docker builds, and Caddy configuration validation. There is currently no dedicated formatter or linter command in CI; that gap is recorded in the [acceptance status](docs/scope-and-acceptance.md#implementation-status).
+The [CI workflow](.github/workflows/verify.yml) runs type checks, backend unit and API tests, PostgreSQL integration tests, frontend and backend builds, desktop/mobile browser tests, production Compose validation, Docker builds, and Caddy configuration validation. There is currently no dedicated formatter or linter command in CI; that gap is recorded in the [acceptance status](docs/scope-and-acceptance.md#implementation-status).
 
 ## Current design choices
 

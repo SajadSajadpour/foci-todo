@@ -21,6 +21,7 @@ jobs:
       - run: cp apps/backend/.env.example apps/backend/.env
       - run: npm run typecheck:backend
       - run: npm run test:backend
+      - run: npm run test:postgres
       - run: npm run build:backend
       - run: npm run typecheck:frontend
       - run: npm run build:frontend
