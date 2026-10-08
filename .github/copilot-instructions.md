@@ -1,0 +1,13 @@
+# Foci Tasks repository guidance
+
+This is a focused full-stack assessment, not a general productivity platform. Read the root `README.md`, `docs/scope-and-acceptance.md`, `docs/architecture.md`, and `docs/api-contract.md` before changing behavior. Preserve the implemented scope and document intentional changes.
+
+- Keep the React/TypeScript app in `apps/frontend` and the Fastify/TypeScript API in `apps/backend`. They build independently and communicate through relative `/api` requests. Only the backend accesses PostgreSQL.
+- Keep related UI and API behavior in their feature directories. Define task query values, page size, and other repeated domain rules centrally; avoid unexplained magic strings, but do not abstract one-off values without a reason.
+- Treat the backend as the source of truth. Scope every task query and mutation to the authenticated user. Return `404` for another user's task. Validate input at the API boundary and preserve the documented date-only `YYYY-MM-DD` semantics.
+- Preserve Argon2id password hashing, HttpOnly session cookies, CSRF checks on authenticated mutations, and secure production cookie settings. Do not put credentials, session tokens, or production secrets in source code, logs, examples, or browser storage.
+- Change the Drizzle schema and add a versioned migration together when the database model changes. Keep the Mermaid ERD and API contract in sync with behavior.
+- Keep the UI responsive and keyboard accessible. Maintain clear loading, first-use empty, filtered-empty, error, and confirmation states. Use the Figma briefs as design references while keeping labels, counts, pagination, and actions tied to real API data.
+- The application does not integrate an LLM. Do not add a provider-specific AI dependency or claim an AI feature exists. If a future requirement calls for AI, define the product behavior and a replaceable provider boundary first.
+- Add tests for meaningful behavior and regressions. Run relevant type checks and builds, `npm run test:backend` for API changes, and `npm run test:e2e` for browser journeys when the local PostgreSQL and browser environment are available. State clearly when a check could not run.
+- Keep `README.md`, the API contract, architecture diagrams, and deployment guide aligned with the implementation. The production Compose/TLS configuration is prepared, but a public deployment, backup restore, SonarCloud, and ZAP verification have not been completed.

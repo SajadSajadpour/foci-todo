@@ -12,7 +12,7 @@ Keep the product focused. Do not add projects, teams, AI assistants, recurring t
 | --- | --- | --- |
 | Sign in | Email, password, submit, link to registration | Invalid credentials, submitting, offline/server error |
 | Register | Email, password, confirmation, submit, link to sign in | Duplicate email, invalid input, submitting; successful registration leads to sign in |
-| Task list | Header, new-task action, task rows/cards showing title, due date, completion | Loading, empty, list, failed load, completion failure |
+| Task list | Header, new-task action, status filter, sort order, result count, pagination, task rows showing title, due date, and completion | Loading, first-use empty, filtered empty, list, failed load, completion failure |
 | Task detail | Title, description, due date, status, created date, edit/delete controls | Loading, not found, failed load |
 | Create/edit task | Title, optional description, optional due date, save/cancel | Field errors, saving, failed save with input retained |
 | Delete confirmation | Task title, clear destructive action and cancel | Deleting, failure without closing prematurely |
@@ -24,11 +24,11 @@ Use a route for `/login`, `/register`, `/tasks`, `/tasks/new`, `/tasks/:id`, and
 ```text
 apps/frontend/
   src/
-    app/                 routing, session bootstrap, app shell
+    app/                 routing and protected routes
     features/auth/       sign-in/register forms and auth state
-    features/tasks/      list, detail, editor, completion, delete
+    features/tasks/      list, detail, editor, completion, delete dialog
     shared/api/          typed fetch client and API error mapping
-    shared/components/   buttons, fields, feedback, dialog
+    shared/components/   brand and feedback components
     styles/              tokens and responsive global styles
 ```
 
@@ -42,7 +42,7 @@ Keep task data local to the task feature. A straightforward query/mutation appro
 - Mobile: one-column layout, touch-sized controls, no horizontal scrolling, prominent create action, and forms that fit a narrow viewport.
 - Use a small visual system: typography scale, color tokens, spacing, radii, button/field states. Visual polish must not hide the task status or actions.
 
-## Implementation order and reviewable commits
+## Implementation sequence and reviewable commits
 
 1. Scaffold Vite/React/TypeScript, routing, global styles, API client, and local proxy. Confirm the app builds.
 2. Implement session bootstrap and sign-in/register/logout. Exercise the real backend flow.
@@ -54,7 +54,7 @@ Keep task data local to the task feature. A straightforward query/mutation appro
 
 Create a high-fidelity, editable, responsive design for a focused personal task app named **Foci Tasks**. This is a professional software engineering assessment, so make it calm, credible, and useful rather than a generic productivity dashboard. Use a light theme, warm neutral background, dark readable type, one restrained accent color, generous whitespace, and subtle borders. The result should look intentional and implementable with React and CSS.
 
-Design desktop (1440px) and mobile (390px) versions of: sign in, registration, populated task list, empty task list, task detail, create/edit task form, and delete confirmation. Show realistic example tasks. A task has only title, optional description, optional due date, completed status, and creation date. Make completed and incomplete tasks visually distinct without relying on color alone. Show loading, validation, and network error treatments as reusable states or annotations.
+Design desktop (1440px) and mobile (390px) versions of: sign in, registration, populated task list, first-use and filtered-empty task lists, task detail, create/edit task form, and delete confirmation. The task list has an All tasks/Incomplete/Completed status control, a sort control, server-provided result counts, and pagination. Show realistic example tasks. A task has only title, optional description, optional due date, completed status, and creation date. Make completed and incomplete tasks visually distinct without relying on color alone. Show loading, validation, and network error treatments as reusable states or annotations. The [task-list refinement brief](figma-filter-sort-ux-prompt.md) records the final list-control design.
 
 The main journey is register -> sign in -> task list -> create -> detail -> edit -> complete/reopen -> delete. Give the list a prominent “New task” action. Keep forms concise. Use clear labels, visible focus, accessible contrast, touch-sized targets, and a keyboard-friendly confirmation dialog. On mobile, keep all key actions available without horizontal scrolling. Define reusable colors, typography, spacing, buttons, fields, task rows, badges, feedback messages, and dialog components. Do not add features absent from the app: no AI assistant, projects, teams, priority, recurring tasks, notifications, or analytics.
 

@@ -1,15 +1,23 @@
 # To Do Application
 
-Foci take-home assessment. This repository will contain two independent applications in one Git repository:
+Foci take-home assessment. This repository contains two independently built applications in one Git repository:
 
 - `apps/backend`: TypeScript API, authentication, task rules, and PostgreSQL access.
 - `apps/frontend`: React and TypeScript user interface.
 
-The product scope and acceptance criteria are in the [planning document](../Foci%20Todo%20Scope%20and%20Acceptance%20Criteria.md). The [API contract](docs/api-contract.md), [architecture decisions](docs/architecture.md), [frontend plan](docs/frontend-plan.md), [Figma UX brief](docs/figma-ux-brief.md), and [deployment guide](docs/deployment.md) record the design.
+The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract](docs/api-contract.md), [architecture and ERD](docs/architecture.md), [frontend plan](docs/frontend-plan.md), [Figma UX brief](docs/figma-ux-brief.md), [task-list refinement brief](docs/figma-filter-sort-ux-prompt.md), and [deployment guide](docs/deployment.md) record the design and delivery decisions. [Repository instructions for Copilot](.github/copilot-instructions.md) capture the coding conventions.
 
 ## Current status
 
-The backend implements registration, login, logout, current session, and full task CRUD including completion and incompletion. Task listing supports status filtering, stable sorting, and 20-item server-side pages. Automated HTTP tests cover validation, CSRF checks, logout, task lifecycle, pagination, and user isolation. The responsive frontend implements authentication, protected routing, task listing, creation, detail, editing, completion/reopening, and confirmed deletion. Both applications have Docker images and a local container stack; the production Compose/TLS configuration is prepared but not deployed.
+| Area | Delivered |
+| --- | --- |
+| Accounts | Registration, sign-in, session restoration, sign-out, private task ownership, Argon2id password hashes, HttpOnly session cookies, and CSRF protection. |
+| Tasks | Create, list, view by ID, edit, complete/reopen, and confirmed deletion; title and date validation; PostgreSQL persistence. |
+| Task list | Server-side status filtering, stable sorting, 20-item pagination, accurate result counts, and distinct first-use and filtered-empty states. |
+| Interface | Responsive React UI based on the Figma design, with loading and error feedback, accessible controls, and desktop/mobile browser checks. |
+| API and delivery | OpenAPI/Swagger UI, code-first Drizzle schema and migration, separate Docker images, local Compose stack, and GitHub Actions verification. |
+
+The production Compose and TLS 1.3 configuration is prepared but has **not** been publicly deployed. SonarCloud, ZAP scanning, off-host backups, and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
 
 ## Run locally
 
@@ -33,6 +41,14 @@ The API listens on `http://localhost:3000`; `GET /api/health` provides a basic h
 
 To run both applications as containers instead, use `docker compose up --build --wait -d` and open `http://127.0.0.1:8080`; Swagger UI is at `http://127.0.0.1:8080/api/docs/`. The [deployment guide](docs/deployment.md) explains the production stack and its separate TLS configuration.
 
+| Configuration | Purpose |
+| --- | --- |
+| [`apps/backend/.env.example`](apps/backend/.env.example) | Local API database connection and port template. |
+| [`compose.yaml`](compose.yaml) | Loopback-only local web and database stack with migration step. |
+| [`.env.production.example`](.env.production.example) and [`compose.production.yaml`](compose.production.yaml) | Production values and service topology; replace example secrets before deployment. |
+| [`apps/frontend/Caddyfile.production`](apps/frontend/Caddyfile.production) | HTTPS/TLS 1.3, same-origin API proxy, and security headers. |
+| [`.github/workflows/verify.yml`](.github/workflows/verify.yml) | Push and pull-request verification. |
+
 ```bash
 npm run test:backend
 npm run typecheck:backend
@@ -49,6 +65,8 @@ npm run test:e2e
 ```
 
 The backend tests use an in-memory implementation of the storage contract and do not require Docker. The browser tests start the Compose database, run migrations, and start the API and UI when needed. They use unique local test accounts and check task CRUD, responsive overflow, form/dialog behavior, and WCAG 2.0/2.1 A and AA rules with axe. GitHub Actions runs these checks on pushes and pull requests. The test suite does not reset your database; keep the local Compose database for development and repeat checks in each deployment environment.
+
+The [CI workflow](.github/workflows/verify.yml) runs type checks, backend tests, frontend and backend builds, desktop/mobile browser tests, production Compose validation, Docker builds, and Caddy configuration validation. There is currently no dedicated formatter or linter command in CI; that gap is recorded in the [acceptance status](docs/scope-and-acceptance.md#implementation-status).
 
 ## Current design choices
 

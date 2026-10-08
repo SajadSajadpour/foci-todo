@@ -2,7 +2,7 @@
 
 All endpoints use the `/api` prefix and JSON request and response bodies except logout and delete, which may return `204 No Content`. The browser uses a server-managed session cookie. Task routes require an authenticated session.
 
-**Implementation status:** authentication and all task routes below are implemented and connected to the frontend. Local PostgreSQL verification covers registration, login, task creation, listing, editing, and deletion. Swagger UI is served at `/api/docs/`; the generated OpenAPI document is at `/api/docs/json`.
+**Implementation status:** authentication and all task routes below are implemented and connected to the frontend. Backend and live PostgreSQL browser checks cover registration, login, task creation, listing, filtering, sorting, pagination, editing, completion, and deletion. Swagger UI is served at `/api/docs/`; the generated OpenAPI document is at `/api/docs/json`.
 
 | Method | Path | Purpose | Success | Main errors |
 | --- | --- | --- | --- | --- |

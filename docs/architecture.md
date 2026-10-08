@@ -39,11 +39,16 @@ erDiagram
 
 Session tokens are hashed before storage. PostgreSQL persists accounts, sessions, and tasks in a named Docker volume during local container runs.
 
+## Task-list query
+
+The API scopes each list request to the signed-in user before counting or applying `status=all|active|completed`. Sorting uses `newest`, `oldest`, `dueSoon`, or `title`, with the task ID as a stable tie-breaker; undated tasks come last for `dueSoon`. The API returns at most 20 tasks with `total`, `page`, `pageSize`, and `totalPages`. The React list requests the selected page from the server and returns to page 1 when the filter or sort changes. This avoids loading the entire task collection in the browser.
+
 ## Main user journey
 
 ```mermaid
 flowchart LR
     Visitor --> Register --> Login --> TaskList
+    TaskList -->|filter, sort, change page| TaskList
     TaskList --> CreateTask --> TaskList
     TaskList --> ViewTask --> EditTask --> TaskList
     ViewTask --> SetCompletion --> TaskList
