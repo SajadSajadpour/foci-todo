@@ -139,8 +139,10 @@ test('task filters, sort order, and pagination use the persisted task list', asy
   await expect(page.getByText('Page 1 of 2')).toBeVisible();
 
   await page.getByRole('button', { name: 'Completed', exact: true }).click();
-  await page.getByRole('button', { name: /^Reopen:/ }).first().click();
-  await page.getByRole('button', { name: /^Reopen:/ }).click();
+  await expect(page.locator('.task-row')).toHaveCount(2);
+  await page.getByRole('button', { name: 'Reopen: Task 02' }).click();
+  await expect(page.locator('.task-row')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Reopen: Task 01' }).click();
   await expect(page.getByRole('heading', { name: 'No completed tasks yet.' })).toBeVisible();
   await expect(page.getByText('0 completed tasks')).toBeVisible();
   await expectAccessible(page);
