@@ -31,6 +31,15 @@ type TodoUpdate = { title?: string; description?: string | null; dueDate?: strin
 type TodoParams = { id: string };
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+function isValidEmail(email: string): boolean {
+  if (/\s/.test(email)) return false;
+  const separator = email.indexOf('@');
+  if (separator <= 0 || separator !== email.lastIndexOf('@')) return false;
+  const domain = email.slice(separator + 1);
+  const dot = domain.lastIndexOf('.');
+  return dot > 0 && dot < domain.length - 1;
+}
+
 const credentialsSchema = {
   type: 'object',
   required: ['email', 'password'],
@@ -174,7 +183,7 @@ export async function buildApp(store: Store): Promise<FastifyInstance> {
     },
     async (request, reply) => {
       const email = request.body.email.trim().toLowerCase();
-      if (!/^\S+@\S+\.\S+$/.test(email)) {
+      if (!isValidEmail(email)) {
         return reply.code(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Enter a valid email address.' } });
       }
       if (await store.findUserByEmail(email)) {

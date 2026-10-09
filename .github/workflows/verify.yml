@@ -19,14 +19,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check:quality
-      - run: cp apps/backend/.env.example apps/backend/.env
+      - run: npm run setup:local
       - run: npm run typecheck:backend
       - run: npm run test:backend
       - run: npm run test:postgres
       - run: npm run build:backend
       - run: npm run typecheck:frontend
       - run: npm run build:frontend
-      - run: PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install --with-deps chromium
+      - run: PLAYWRIGHT_BROWSERS_PATH=0 ./node_modules/.bin/playwright install --with-deps chromium
       - run: npm run test:e2e
       - run: docker compose --env-file .env.production.example -f compose.production.yaml config --quiet
       - run: docker compose build backend web

@@ -16,6 +16,7 @@ flowchart LR
 From the repository root, with Docker running:
 
 ```bash
+npm run setup:local
 docker compose up --build --wait -d
 ```
 

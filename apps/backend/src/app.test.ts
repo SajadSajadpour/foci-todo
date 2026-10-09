@@ -94,6 +94,18 @@ async function signIn(app: Awaited<ReturnType<typeof buildApp>>, email: string) 
 }
 
 describe('account and first task slice', () => {
+  it('rejects malformed email addresses during registration', async () => {
+    const app = await buildApp(memoryStore());
+    try {
+      for (const email of ['a@b@c.com', 'a b@example.com', 'a@example', '@example.com', 'a@.com']) {
+        const response = await app.inject({ method: 'POST', url: '/api/auth/register', payload: credentials(email) });
+        expect(response.statusCode).toBe(400);
+      }
+    } finally {
+      await app.close();
+    }
+  });
+
   it('publishes an OpenAPI contract and Swagger UI matching the authenticated routes', async () => {
     const app = await buildApp(memoryStore());
     try {

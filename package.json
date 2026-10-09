@@ -6,6 +6,7 @@
     "apps/frontend"
   ],
   "scripts": {
+    "setup:local": "node scripts/setup-local.mjs",
     "check:quality": "biome check",
     "format": "biome check --write",
     "dev:backend": "npm run dev -w @foci/backend",

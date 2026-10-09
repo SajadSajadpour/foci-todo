@@ -25,7 +25,7 @@ Requirements: Node.js 22 or later, npm, and Docker with Compose. Docker must be 
 
 ```bash
 npm ci
-cp apps/backend/.env.example apps/backend/.env
+npm run setup:local
 docker compose up --wait -d db
 npm run db:migrate -w @foci/backend
 npm run dev:backend
@@ -37,13 +37,13 @@ In a second terminal from the repository root:
 npm run dev:frontend
 ```
 
-The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. Interactive API documentation is at `http://localhost:3000/api/docs/` and its OpenAPI JSON is at `/api/docs/json`. The frontend listens on `http://localhost:5173` and proxies `/api` to the backend. The local Compose configuration binds PostgreSQL to `127.0.0.1:5433` (container port 5432) and keeps its data in a named volume. If that host port is already used, change the host port and `.env` together.
+`setup:local` creates matching, ignored `.env` and `apps/backend/.env` files with a random local database password. If you already have one file, create the other with the same password; the script will not overwrite existing settings or reset your database. The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. Interactive API documentation is at `http://localhost:3000/api/docs/` and its OpenAPI JSON is at `/api/docs/json`. The frontend listens on `http://localhost:5173` and proxies `/api` to the backend. The local Compose configuration binds PostgreSQL to `127.0.0.1:5433` (container port 5432) and keeps its data in a named volume. If that host port is already used, change the host port and backend `.env` together.
 
 To run both applications as containers instead, use `docker compose up --build --wait -d` and open `http://127.0.0.1:8080`; Swagger UI is at `http://127.0.0.1:8080/api/docs/`. The [deployment guide](docs/deployment.md) explains the production stack and its separate TLS configuration.
 
 | Configuration | Purpose |
 | --- | --- |
-| [`apps/backend/.env.example`](apps/backend/.env.example) | Local API database connection and port template. |
+| [`apps/backend/.env.example`](apps/backend/.env.example) | Local API database connection and port template; `setup:local` generates the actual ignored settings. |
 | [`compose.yaml`](compose.yaml) | Loopback-only local web and database stack with migration step. |
 | [`compose.test.yaml`](compose.test.yaml) | Disposable PostgreSQL instance for integration tests; separate from the development stack. |
 | [`.env.production.example`](.env.production.example) and [`compose.production.yaml`](compose.production.yaml) | Production values and service topology; replace example secrets before deployment. |

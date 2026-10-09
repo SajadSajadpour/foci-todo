@@ -3,7 +3,7 @@ services:
     image: postgres:17-alpine
     environment:
       POSTGRES_USER: foci
-      POSTGRES_PASSWORD: foci_local_only
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Run npm run setup:local first}
       POSTGRES_DB: foci_todo
     ports:
       - "127.0.0.1:5433:5432"
@@ -20,7 +20,7 @@ services:
       dockerfile: apps/backend/Dockerfile
     image: foci-todo-backend:local
     environment:
-      DATABASE_URL: postgres://foci:foci_local_only@db:5432/foci_todo
+      DATABASE_URL: postgres://foci:${DB_PASSWORD:?Run npm run setup:local first}@db:5432/foci_todo
     depends_on:
       db:
         condition: service_healthy
@@ -31,7 +31,7 @@ services:
       dockerfile: apps/backend/Dockerfile
     image: foci-todo-backend:local
     environment:
-      DATABASE_URL: postgres://foci:foci_local_only@db:5432/foci_todo
+      DATABASE_URL: postgres://foci:${DB_PASSWORD:?Run npm run setup:local first}@db:5432/foci_todo
       NODE_ENV: development
       PORT: 3000
     depends_on:
