@@ -1,11 +1,13 @@
 import { randomBytes } from 'node:crypto';
-import { existsSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const rootEnv = fileURLToPath(new URL('../.env', import.meta.url));
 const backendEnv = fileURLToPath(new URL('../apps/backend/.env', import.meta.url));
 
 if (existsSync(rootEnv) && existsSync(backendEnv)) {
+  chmodSync(rootEnv, 0o600);
+  chmodSync(backendEnv, 0o600);
   console.log('Local environment files already exist.');
 } else if (existsSync(rootEnv) || existsSync(backendEnv)) {
   console.error('Only one local environment file exists. Set the same DB password in .env and apps/backend/.env.');
