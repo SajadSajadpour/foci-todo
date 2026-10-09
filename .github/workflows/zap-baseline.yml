@@ -1,0 +1,29 @@
+name: Passive security scan
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  zap-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Scan the public HTTPS demo
+        run: |
+          mkdir -p zap-report
+          docker run --rm --user 0 \
+            -v "$GITHUB_WORKSPACE/zap-report:/zap/wrk:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t https://99-79-191-113.sslip.io/ \
+            -m 1 -j -I -r report.html -J report.json
+      - name: Save scan reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: zap-report/
+          if-no-files-found: warn
+          retention-days: 7

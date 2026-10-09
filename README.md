@@ -17,7 +17,7 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 | Interface | Responsive React UI based on the Figma design, with loading and error feedback, accessible controls, and desktop/mobile browser checks. |
 | API and delivery | OpenAPI/Swagger UI, code-first Drizzle schema and migration, separate Docker images, local Compose stack, and GitHub Actions verification. |
 
-The EC2 demo now runs the HTTPS Compose configuration on a temporary DNS hostname. An external check verified the trusted certificate, TLS 1.3, HTTP-to-HTTPS redirect, and successful home-page and API-health responses. The authenticated task journey was verified on the initial HTTP demo and should be repeated after the HTTPS switch. SonarCloud, ZAP scanning, off-host backups, and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
+The EC2 demo now runs the HTTPS Compose configuration on a temporary DNS hostname. An external check verified the trusted certificate, TLS 1.3, HTTP-to-HTTPS redirect, and successful home-page and API-health responses. The authenticated task journey was verified on the initial HTTP demo and should be repeated after the HTTPS switch. SonarQube Cloud has run its first automatic analysis; its findings are being reviewed. A manual ZAP baseline workflow is configured but has not yet run. Off-host backups and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
 
 ## Run locally
 
@@ -54,6 +54,7 @@ To run both applications as containers instead, use `docker compose up --build -
 ```bash
 npm run test:backend
 npm run test:postgres
+npm run check:quality
 npm run typecheck:backend
 npm run build:backend
 npm run typecheck:frontend
@@ -69,7 +70,7 @@ npm run test:e2e
 
 The backend test command runs focused calendar-date unit cases and API tests against an in-memory implementation of the storage contract; it does not require Docker. `npm run test:postgres` starts a separate, disposable PostgreSQL container on loopback port 5434, migrates it, checks real database ownership, filtering, sorting, pagination, and persistence across a connection restart, then removes the test container. It never uses the development database. The browser tests start the development Compose database, run migrations, and start the API and UI when needed. They use unique local test accounts and check task CRUD, responsive overflow, form/dialog behavior, and WCAG 2.0/2.1 A and AA rules with axe. GitHub Actions runs these checks on pushes and pull requests. The browser suite does not reset your development database; keep the local Compose database for development and repeat checks in each deployment environment.
 
-The [CI workflow](.github/workflows/verify.yml) runs type checks, backend unit and API tests, PostgreSQL integration tests, frontend and backend builds, desktop/mobile browser tests, production Compose validation, Docker builds, and Caddy configuration validation. There is currently no dedicated formatter or linter command in CI; that gap is recorded in the [acceptance status](docs/scope-and-acceptance.md#implementation-status).
+The [CI workflow](.github/workflows/verify.yml) runs Biome formatting, lint and import checks, type checks, backend unit and API tests, PostgreSQL integration tests, frontend and backend builds, desktop/mobile browser tests, production Compose validation, Docker builds, and Caddy configuration validation. Run `npm run format` to apply safe formatting and import fixes locally. The [manual ZAP baseline workflow](.github/workflows/zap-baseline.yml) performs a passive scan of the public HTTPS demo and saves a report; it does not authenticate into private task pages.
 
 ## Current design choices
 
