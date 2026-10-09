@@ -9,7 +9,7 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 
 ## Current status
 
-Automatic EC2 deployment is prepared but disabled until the one-time [AWS and GitHub setup](docs/continuous-deployment.md) is complete. The deployment runs only after a passing main-branch verification.
+Automatic EC2 deployment is configured through the [AWS and GitHub setup](docs/continuous-deployment.md). It runs only after a passing main-branch verification and checks the public HTTPS health endpoint.
 
 | Area | Delivered |
 | --- | --- |

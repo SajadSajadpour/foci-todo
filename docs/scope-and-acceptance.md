@@ -76,4 +76,4 @@ Status filtering, stable sorting, 20-item pagination, and distinct first-use and
 
 ## Remaining delivery work
 
-Off-host backups and a restore drill are still needed before treating this as a durable service. The [continuous deployment workflow](continuous-deployment.md) is implemented but remains disabled until the EC2 instance profile, GitHub OIDC role, and repository variables are configured and verified.
+Off-host backups and a restore drill are still needed before treating this as a durable service. The [continuous deployment workflow](continuous-deployment.md) is implemented with an EC2 instance profile, a repository-scoped GitHub OIDC role, and a passing-CI deployment gate.
