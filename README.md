@@ -1,5 +1,11 @@
 # Foci Tasks
 
+> **Try the live assessment demo first**
+>
+> [Open the app](https://99-79-191-113.sslip.io/) · [Explore the Swagger UI](https://99-79-191-113.sslip.io/api/docs/) · [View the OpenAPI JSON](https://99-79-191-113.sslip.io/api/docs/json)
+>
+> Register your own account with a password of at least 12 characters, then sign in. There is no shared demo account or seeded task data; each account has a private task list. This temporary demo may be shut down after the assessment.
+
 Foci take-home assessment. This repository contains two independently built applications in one Git repository:
 
 - `apps/backend`: TypeScript API, authentication, task rules, and PostgreSQL access.
@@ -9,7 +15,7 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 
 ## Reviewer quick start
 
-The repository contains everything needed to run the app locally. There is no shared demo password or seeded task data: register your own account with an email address and a password of at least 12 characters, then sign in. Accounts have private task lists. If a hosted review URL is supplied separately, the same flow works there.
+The repository also contains everything needed to run the app locally. The same registration and sign-in flow works in the local stack.
 
 To run the complete app from this Git repository, install Git, Node.js **22.12 or later**, and Docker with Compose. With Docker running:
 
@@ -26,7 +32,7 @@ This setup was checked from a fresh public Git clone on October 9, 2026: depende
 
 ## Current status
 
-The repository includes [CI-gated deployment instructions](docs/continuous-deployment.md) using GitHub OIDC and AWS Systems Manager. Deployment-specific values are configured outside Git. The workflow deploys only after a passing main-branch verification and checks the HTTPS health endpoint.
+The repository includes [CI-gated deployment instructions](docs/continuous-deployment.md) using GitHub OIDC and AWS Systems Manager. Deployment credentials, instance settings, and secrets are configured outside Git; the public demo URL is linked above. The workflow deploys only after a passing main-branch verification and checks the HTTPS health endpoint.
 
 | Area | Delivered |
 | --- | --- |
