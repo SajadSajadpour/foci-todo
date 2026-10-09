@@ -17,7 +17,7 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 | Interface | Responsive React UI based on the Figma design, with loading and error feedback, accessible controls, and desktop/mobile browser checks. |
 | API and delivery | OpenAPI/Swagger UI, code-first Drizzle schema and migration, separate Docker images, local Compose stack, and GitHub Actions verification. |
 
-The temporary HTTP demo is deployed on EC2; its public home page, API health endpoint, and authenticated task journey have been verified. The production Compose and TLS 1.3 configuration is prepared but has **not** been publicly deployed. SonarCloud, ZAP scanning, off-host backups, and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
+The EC2 demo now runs the HTTPS Compose configuration on a temporary DNS hostname. An external check verified the trusted certificate, TLS 1.3, HTTP-to-HTTPS redirect, and successful home-page and API-health responses. The authenticated task journey was verified on the initial HTTP demo and should be repeated after the HTTPS switch. SonarCloud, ZAP scanning, off-host backups, and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
 
 ## Run locally
 
@@ -86,6 +86,6 @@ The [CI workflow](.github/workflows/verify.yml) runs type checks, backend unit a
 - A due date is an optional calendar date in `YYYY-MM-DD` format. Past dates are valid, and no timezone conversion is applied. The server sets task IDs and creation timestamps.
 - PostgreSQL provides persistence across application and database-container restarts when its named volume is retained. Removing that volume deletes local data.
 - Filtering and sorting controls are optional in the brief and implemented here. The API defaults to newest first and returns at most 20 tasks per page. Offset pagination keeps this assessment's expected list sizes bounded; a cursor would be preferable for very deep lists or frequently changing large datasets.
-- The production configuration is prepared but has not been deployed. A public endpoint, real certificate, backups, and recovery verification require an EC2 host and domain.
+- The HTTPS configuration is deployed to a single EC2 host using a temporary third-party DNS hostname. A trusted certificate and TLS 1.3 were externally verified; off-host backups and a restore drill have not been completed. This short-lived assessment demo is not a durable production service.
 
-No AWS credentials are required to run the application locally. Provisioning an EC2 host, attaching a domain, issuing a public certificate, and checking the deployed service remain separate steps.
+No AWS credentials are required to run the application locally. The [deployment guide](docs/deployment.md) records the EC2 layout, HTTPS setup, and verification boundaries.

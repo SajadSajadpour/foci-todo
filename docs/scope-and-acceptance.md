@@ -50,7 +50,7 @@ The interface has a responsive task list, create and edit form, task detail view
 | T1–T8, A1–A7, A9 | Implemented in the API and React UI; covered by backend and desktop/mobile browser tests as applicable. See the [API contract](api-contract.md), [architecture](architecture.md), and [root README](../README.md). |
 | T9 | PostgreSQL persistence uses a named Compose volume. Browser tests verify that saved task changes survive a page reload; a dedicated PostgreSQL integration test verifies persistence across a database connection restart. An automated database-container restart test is not included. |
 | A8 | Partially complete: CI runs type checks, focused date-validation unit tests, API tests, an isolated PostgreSQL integration test, frontend/backend builds, browser journeys with accessibility checks, and production configuration checks. Dedicated formatting and lint commands are not configured. |
-| A10 | Local Docker images and Compose run; production Compose, Caddy TLS 1.3 configuration, and deployment/recovery instructions are prepared. Public deployment, off-host backups, and a restore drill remain unverified. |
+| A10 | Local Docker images and Compose run. The EC2 demo uses the HTTPS Compose configuration; its trusted certificate, TLS 1.3 connection, redirect, home page, and API health endpoint were externally verified. Off-host backups and a restore drill remain unverified. |
 
 Status filtering, stable sorting, 20-item pagination, and distinct first-use and filtered-empty states were added beyond the minimum task requirements. SonarCloud and ZAP scanning were considered but have not been run. The [task-list UX brief](figma-filter-sort-ux-prompt.md) records the later design refinement.
 
@@ -76,4 +76,4 @@ Status filtering, stable sorting, 20-item pagination, and distinct first-use and
 
 ## Remaining delivery work
 
-Run a dedicated formatter and linter in CI if those checks are retained as acceptance criteria. If publishing a live demo, provision the EC2 host and domain, verify real TLS and task journeys, set up off-host backups, and test a restore. SonarCloud and ZAP remain optional review additions rather than completed controls.
+Run a dedicated formatter and linter in CI if those checks are retained as acceptance criteria. Repeat the authenticated task journey on the new HTTPS hostname. Off-host backups and a restore drill are still needed before treating this as a durable service. SonarCloud and ZAP remain optional review additions rather than completed controls.
