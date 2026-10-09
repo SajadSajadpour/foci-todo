@@ -9,7 +9,7 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 
 ## Current status
 
-Automatic EC2 deployment is configured through the [AWS and GitHub setup](docs/continuous-deployment.md). It runs only after a passing main-branch verification and checks the public HTTPS health endpoint.
+Automatic EC2 deployment is active through the [AWS and GitHub setup](docs/continuous-deployment.md). It runs only after a passing main-branch verification and checks the public HTTPS health endpoint. The first end-to-end Verify and Deploy runs passed on October 9, 2026.
 
 | Area | Delivered |
 | --- | --- |
@@ -19,7 +19,7 @@ Automatic EC2 deployment is configured through the [AWS and GitHub setup](docs/c
 | Interface | Responsive React UI based on the Figma design, with loading and error feedback, accessible controls, and desktop/mobile browser checks. |
 | API and delivery | OpenAPI/Swagger UI, code-first Drizzle schema and migration, separate Docker images, local Compose stack, and GitHub Actions verification. |
 
-The EC2 demo runs the HTTPS Compose configuration on a temporary DNS hostname. An external check verified the trusted certificate, TLS 1.3, HTTP-to-HTTPS redirect, and successful home-page and API-health responses. Sign-in and existing tasks were verified after redeployment. SonarQube Cloud's quality gate passes; one low-severity Caddy privilege finding remains documented. The repeat ZAP passive baseline reports no high, medium, or low alerts; four informational alerts remain. See the [security review](docs/security-review.md) for evidence and limitations. Off-host backups and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
+The EC2 demo runs the HTTPS Compose configuration on a temporary DNS hostname. An external check verified the trusted certificate, TLS 1.3, HTTP-to-HTTPS redirect, and successful home-page and API-health responses. Sign-in and existing tasks were verified after redeployment. SonarQube Cloud and ZAP results, including their remaining findings and limits, are recorded in the [security review](docs/security-review.md). The repeat ZAP passive baseline reports no high, medium, or low alerts; four informational alerts remain. Off-host backups and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
 
 ## Run locally
 
@@ -41,7 +41,7 @@ npm run dev:frontend
 
 `setup:local` creates matching, ignored `.env` and `apps/backend/.env` files with a random local database password. If you already have one file, create the other with the same password; the script will not overwrite existing settings or reset your database. The API listens on `http://localhost:3000`; `GET /api/health` provides a basic health response. Interactive API documentation is at `http://localhost:3000/api/docs/` and its OpenAPI JSON is at `/api/docs/json`. The frontend listens on `http://localhost:5173` and proxies `/api` to the backend. The local Compose configuration binds PostgreSQL to `127.0.0.1:5433` (container port 5432) and keeps its data in a named volume. If that host port is already used, change the host port and backend `.env` together.
 
-To run both applications as containers instead, use `docker compose up --build --wait -d` and open `http://127.0.0.1:8080`; Swagger UI is at `http://127.0.0.1:8080/api/docs/`. The [deployment guide](docs/deployment.md) explains the production stack and its separate TLS configuration.
+The local setup command creates both secret-bearing files with owner-only (`600`) permissions and tightens permissions on both existing files when rerun. It does not alter their contents. To run both applications as containers instead, use `docker compose up --build --wait -d` and open `http://127.0.0.1:8080`; Swagger UI is at `http://127.0.0.1:8080/api/docs/`. The [deployment guide](docs/deployment.md) explains the production stack and its separate TLS configuration.
 
 | Configuration | Purpose |
 | --- | --- |
@@ -52,7 +52,7 @@ To run both applications as containers instead, use `docker compose up --build -
 | [`.env.demo.example`](.env.demo.example) and [`compose.demo.yaml`](compose.demo.yaml) | Isolated, temporary HTTP demo on a public IP; use only throwaway credentials and data. |
 | [`apps/frontend/Caddyfile.production`](apps/frontend/Caddyfile.production) | HTTPS/TLS 1.3, same-origin API proxy, and security headers. |
 | [`.github/workflows/verify.yml`](.github/workflows/verify.yml) | Push and pull-request verification. |
-| [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) | Deploy a verified main-branch commit to EC2 through AWS Systems Manager once enabled. |
+| [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) | Deploy a verified main-branch commit to EC2 through AWS Systems Manager. |
 
 ```bash
 npm run test:backend

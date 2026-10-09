@@ -2,7 +2,11 @@
 
 The [Deploy workflow](../.github/workflows/deploy.yml) runs only after the Verify workflow succeeds on a push to this repository's main branch. It uses GitHub's OIDC identity to assume a narrowly scoped AWS role, sends a Systems Manager (SSM) command to the existing EC2 instance, and waits for the command's result. The host fetches and fast-forwards to the **exact verified commit**, rebuilds the existing HTTPS Compose project, waits for healthy containers, and checks the public API over TLS 1.3. A newer push will not cause an older verified run to deploy because the host checks that the verified SHA is still origin/main.
 
-The job remains skipped until the repository variable DEPLOY_ENABLED is set to true. This prevents an AWS setup in progress from breaking normal CI. No AWS access keys or database passwords are stored in GitHub. The production environment file remains at /etc/opt/foci-todo/production.env on the host.
+The job is gated by the repository variable `DEPLOY_ENABLED=true`; it is currently enabled for the assessment EC2 host. No AWS access keys or database passwords are stored in GitHub. The production environment file remains at `/etc/opt/foci-todo/production.env` on the host. GitHub receives temporary AWS credentials through OIDC. Workflow actions are pinned to full commit hashes.
+
+The first end-to-end [Verify run](https://github.com/SajadSajadpour/foci-todo/actions/runs/37970371431) and the following [Deploy run](https://github.com/SajadSajadpour/foci-todo/actions/runs/37970564734) both succeeded on October 9, 2026. The deployment is still a single-host service: a failed rollout has no automatic rollback, and off-host database backups and a restore drill remain outstanding.
+
+The later [Verify run](https://github.com/SajadSajadpour/foci-todo/actions/runs/37971358832) and [Deploy run](https://github.com/SajadSajadpour/foci-todo/actions/runs/37971534514) also succeeded after workflow actions were pinned to full commit hashes. The home page and API health endpoint returned HTTP 200 after that rollout.
 
 ## One-time AWS setup
 
@@ -63,7 +67,7 @@ The job remains skipped until the repository variable DEPLOY_ENABLED is set to t
    | AWS_REGION | EC2 instance Region |
    | EC2_INSTANCE_ID | Existing EC2 instance ID |
    | DEPLOY_SITE_URL | https://99-79-191-113.sslip.io for the current demo; omit the trailing slash |
-   | DEPLOY_ENABLED | Keep unset until the checks below pass, then set to true |
+   | DEPLOY_ENABLED | Set to true after the checks below pass; currently enabled for the assessment host |
 
 7. Check that Verify is green on main, that the SSM instance is Online, and that the role ARN and region/instance variables are correct. Set DEPLOY_ENABLED=true, then push a small commit to main. GitHub Actions should show Verify followed by Deploy. Confirm the SSM command succeeds, the public API health endpoint responds, and the expected commit is checked out on EC2. The workflow never deploys pull-request runs.
 

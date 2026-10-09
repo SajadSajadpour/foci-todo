@@ -1,0 +1,59 @@
+{
+  "source": "Public SonarQube Cloud Web API",
+  "projectUrl": "https://sonarcloud.io/project/overview?id=SajadSajadpour_foci-todo",
+  "capturedAt": "2026-10-09T18:12:22+00:00",
+  "analysis": {
+    "date": "2026-10-09T18:09:57+0000",
+    "revision": "abc462edb4594ae5e33ef9779e8e846ab8e93ba9"
+  },
+  "qualityGate": {
+    "status": "OK",
+    "conditions": [
+      {
+        "metricKey": "new_reliability_rating",
+        "status": "OK",
+        "actualValue": "1"
+      },
+      {
+        "metricKey": "new_security_rating",
+        "status": "OK",
+        "actualValue": "1"
+      },
+      {
+        "metricKey": "new_maintainability_rating",
+        "status": "OK",
+        "actualValue": "1"
+      },
+      {
+        "metricKey": "new_duplicated_lines_density",
+        "status": "OK",
+        "actualValue": "0.0"
+      },
+      {
+        "metricKey": "new_security_hotspots_reviewed",
+        "status": "OK",
+        "actualValue": "100.0"
+      }
+    ]
+  },
+  "measures": {
+    "alert_status": "OK",
+    "reliability_rating": "1.0",
+    "bugs": "0",
+    "duplicated_lines_density": "0.0",
+    "code_smells": "35",
+    "security_rating": "2.0",
+    "ncloc": "4011",
+    "vulnerabilities": "1",
+    "sqale_rating": "1.0"
+  },
+  "openVulnerabilities": [
+    {
+      "rule": "docker:S6471",
+      "severity": "MINOR",
+      "file": "apps/frontend/Dockerfile",
+      "line": 10,
+      "message": "The \"caddy\" image runs with \"root\" as the default user. Make sure it is safe here."
+    }
+  ]
+}
