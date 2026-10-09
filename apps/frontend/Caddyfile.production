@@ -9,8 +9,13 @@
 		Referrer-Policy strict-origin-when-cross-origin
 		Strict-Transport-Security "max-age=31536000"
 		Content-Security-Policy "default-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		Cross-Origin-Embedder-Policy require-corp
+		Cross-Origin-Opener-Policy same-origin
+		Cross-Origin-Resource-Policy same-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 	}
 	handle /api/* {
+		header >Cache-Control "no-store"
 		reverse_proxy backend:3000
 	}
 	handle {
