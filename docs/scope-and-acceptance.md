@@ -52,7 +52,7 @@ The interface has a responsive task list, create and edit form, task detail view
 | A8 | CI runs Biome formatting, lint and import checks, type checks, focused date-validation unit tests, API tests, an isolated PostgreSQL integration test, frontend/backend builds, browser journeys with accessibility checks, and production configuration checks. |
 | A10 | Local Docker images and Compose run. The EC2 demo uses the HTTPS Compose configuration; its trusted certificate, TLS 1.3 connection, redirect, home page, and API health endpoint were externally verified. Off-host backups and a restore drill remain unverified. |
 
-Status filtering, stable sorting, 20-item pagination, and distinct first-use and filtered-empty states were added beyond the minimum task requirements. SonarQube Cloud has run an initial automatic analysis; findings are under review. A manual ZAP baseline workflow is configured but has not yet run. The [task-list UX brief](figma-filter-sort-ux-prompt.md) records the later design refinement.
+Status filtering, stable sorting, 20-item pagination, and distinct first-use and filtered-empty states were added beyond the minimum task requirements. SonarQube Cloud's quality gate passes; the repeat ZAP passive baseline found no high, medium, or low alerts. The [security review](security-review.md) records remaining findings and scan limits. The [task-list UX brief](figma-filter-sort-ux-prompt.md) records the later design refinement.
 
 ## Data model
 
@@ -76,4 +76,4 @@ Status filtering, stable sorting, 20-item pagination, and distinct first-use and
 
 ## Remaining delivery work
 
-Repeat the authenticated task journey on the new HTTPS hostname, triage the initial SonarQube Cloud findings, and run and review the manual ZAP baseline scan. Off-host backups and a restore drill are still needed before treating this as a durable service.
+Off-host backups and a restore drill are still needed before treating this as a durable service. Automated deployment from passing CI is planned but not yet configured.

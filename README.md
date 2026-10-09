@@ -5,7 +5,7 @@ Foci take-home assessment. This repository contains two independently built appl
 - `apps/backend`: TypeScript API, authentication, task rules, and PostgreSQL access.
 - `apps/frontend`: React and TypeScript user interface.
 
-The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract](docs/api-contract.md), [architecture and ERD](docs/architecture.md), [frontend plan](docs/frontend-plan.md), [Figma UX brief](docs/figma-ux-brief.md), [task-list refinement brief](docs/figma-filter-sort-ux-prompt.md), and [deployment guide](docs/deployment.md) record the design and delivery decisions. [Repository instructions for Copilot](.github/copilot-instructions.md) capture the coding conventions.
+The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract](docs/api-contract.md), [architecture and ERD](docs/architecture.md), [frontend plan](docs/frontend-plan.md), [Figma UX brief](docs/figma-ux-brief.md), [task-list refinement brief](docs/figma-filter-sort-ux-prompt.md), [deployment guide](docs/deployment.md), and [security review](docs/security-review.md) record the design and delivery decisions. [Repository instructions for Copilot](.github/copilot-instructions.md) capture the coding conventions.
 
 ## Current status
 
@@ -17,7 +17,7 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 | Interface | Responsive React UI based on the Figma design, with loading and error feedback, accessible controls, and desktop/mobile browser checks. |
 | API and delivery | OpenAPI/Swagger UI, code-first Drizzle schema and migration, separate Docker images, local Compose stack, and GitHub Actions verification. |
 
-The EC2 demo now runs the HTTPS Compose configuration on a temporary DNS hostname. An external check verified the trusted certificate, TLS 1.3, HTTP-to-HTTPS redirect, and successful home-page and API-health responses. The authenticated task journey was verified on the initial HTTP demo and should be repeated after the HTTPS switch. SonarQube Cloud has run its first automatic analysis; its findings are being reviewed. A manual ZAP baseline workflow is configured but has not yet run. Off-host backups and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
+The EC2 demo runs the HTTPS Compose configuration on a temporary DNS hostname. An external check verified the trusted certificate, TLS 1.3, HTTP-to-HTTPS redirect, and successful home-page and API-health responses. Sign-in and existing tasks were verified after redeployment. SonarQube Cloud's quality gate passes; one low-severity Caddy privilege finding remains documented. The repeat ZAP passive baseline reports no high, medium, or low alerts; four informational alerts remain. See the [security review](docs/security-review.md) for evidence and limitations. Off-host backups and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
 
 ## Run locally
 
