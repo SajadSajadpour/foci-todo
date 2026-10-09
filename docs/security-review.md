@@ -17,6 +17,8 @@ The repeat ZAP report's informational alerts are a suspicious-comments match in 
 
 ZAP used a short, unauthenticated passive scan. It did not exercise signed-in task routes, authorization bypasses, or destructive attack techniques. Account ownership and CSRF behavior are covered by automated API, PostgreSQL, and browser tests. Off-host database backup and a restore drill remain outside this temporary assessment deployment.
 
+A clean-clone `npm audit` on October 9 reported four moderate package findings in Drizzle Kit's development-only esbuild/loader chain. `npm audit --omit=dev` reported zero production-dependency findings, and the backend runtime image installs with `--omit=dev`. This does not make the development toolchain risk disappear; review an upstream-compatible Drizzle Kit fix when available rather than forcing the audit-suggested major downgrade without testing.
+
 ## Password and credential storage
 
 - User passwords are stored as Argon2id hashes, and session tokens are hashed before database storage. The browser receives a secure, HttpOnly cookie; authenticated writes use a CSRF token.
