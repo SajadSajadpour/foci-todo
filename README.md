@@ -17,7 +17,7 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 | Interface | Responsive React UI based on the Figma design, with loading and error feedback, accessible controls, and desktop/mobile browser checks. |
 | API and delivery | OpenAPI/Swagger UI, code-first Drizzle schema and migration, separate Docker images, local Compose stack, and GitHub Actions verification. |
 
-The production Compose and TLS 1.3 configuration is prepared but has **not** been publicly deployed. SonarCloud, ZAP scanning, off-host backups, and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
+The temporary HTTP demo is deployed on EC2; its public home page and API health endpoint have been verified. The production Compose and TLS 1.3 configuration is prepared but has **not** been publicly deployed. SonarCloud, ZAP scanning, off-host backups, and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
 
 ## Run locally
 

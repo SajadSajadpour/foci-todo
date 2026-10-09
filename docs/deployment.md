@@ -1,6 +1,6 @@
 # Container deployment
 
-The repository builds two application images: a Node API and a static React site served by Caddy. Caddy proxies `/api/*` to the API, so browser requests and session cookies stay on one origin. PostgreSQL is not exposed publicly. A one-shot migration container must finish before the API starts.
+The repository builds two application images: a Node API and a static React site served by Caddy. Caddy proxies `/api/*` to the API, so browser requests and session cookies stay on one origin. PostgreSQL is not exposed publicly. A one-shot migration container must finish before the API starts. The diagram shows the prepared production topology; the temporary public-IP demo uses HTTP.
 
 ```mermaid
 flowchart LR
@@ -25,15 +25,15 @@ Open `http://127.0.0.1:8080`. This local-only HTTP endpoint binds to loopback an
 
 `compose.demo.yaml` is a separate, disposable HTTP deployment for an assessment demo without a domain. It exposes only the web server on port 80; PostgreSQL and the API remain on private container networks. Since browsers do not send `Secure` cookies over HTTP, this stack uses `NODE_ENV=demo` so login works. This is **not** the production configuration: passwords and session cookies cross the network without transport encryption. Use only throwaway accounts and non-sensitive tasks, and shut down the instance after the review. Do not reuse passwords from any real account.
 
-On the host, copy `.env.demo.example` to `.env.demo`, replace `DB_PASSWORD` with a long random hexadecimal value (for example, `openssl rand -hex 32`), and keep the file out of Git. After Docker and the repository are installed:
+On the host, install Docker and clone the repository into `/opt/foci-todo`. Keep the demo settings outside the checkout in `/etc/opt/foci-todo/demo.env`, owned by root with mode `600`. Use a long random hexadecimal database password, and never commit or print the settings file. From `/opt/foci-todo`, run:
 
 ```bash
-docker compose --env-file .env.demo -f compose.demo.yaml config --quiet
-docker compose --env-file .env.demo -f compose.demo.yaml up --build --wait -d
-docker compose --env-file .env.demo -f compose.demo.yaml ps
+sudo docker compose --env-file /etc/opt/foci-todo/demo.env -f compose.demo.yaml config --quiet
+sudo docker compose --env-file /etc/opt/foci-todo/demo.env -f compose.demo.yaml up --build --wait -d
+sudo docker compose --env-file /etc/opt/foci-todo/demo.env -f compose.demo.yaml ps
 ```
 
-Open `http://PUBLIC_IP/` and verify registration, login, task CRUD, and `http://PUBLIC_IP/api/health`. Allow inbound TCP 80 in the EC2 security group and restrict SSH to your own IP. The host does not need inbound PostgreSQL or API ports. The demo configuration is deliberately isolated from the production Compose project and does not provide TLS or durable backups.
+Open `http://PUBLIC_IP/` and verify registration, login, task CRUD, and `http://PUBLIC_IP/api/health`. Allow inbound TCP 80 in the EC2 security group and restrict SSH to your own IP. The host does not need inbound PostgreSQL or API ports. The demo configuration is deliberately isolated from the production Compose project and does not provide TLS or durable backups. Its public home page and health endpoint were verified on October 9, 2026; an authenticated browser journey still needs manual verification on the deployed host.
 
 ## Production preparation
 
