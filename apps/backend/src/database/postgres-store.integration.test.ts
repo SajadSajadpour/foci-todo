@@ -44,7 +44,13 @@ describe('PostgreSQL task store', () => {
         Array.from({ length: 20 }, (_, index) => `Task ${String(index + 1).padStart(2, '0')}`),
       );
       expect(allSecond).toMatchObject({ total: 25, page: 2, totalPages: 2 });
-      expect(allSecond.todos.map((task) => task.title)).toEqual(['Task 21', 'Task 22', 'Task 23', 'Task 24', 'Task 25']);
+      expect(allSecond.todos.map((task) => task.title)).toEqual([
+        'Task 21',
+        'Task 22',
+        'Task 23',
+        'Task 24',
+        'Task 25',
+      ]);
       expect((await first.store.listTodos(alice.id, { status: 'all', sort: 'title', page: 99 })).page).toBe(2);
 
       const completed = await first.store.listTodos(alice.id, { status: 'completed', sort: 'dueSoon', page: 1 });

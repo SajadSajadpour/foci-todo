@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { routes } from '../../app/routes';
 import { ErrorMessage, SuccessMessage } from '../../shared/components/feedback';
-import { useSession } from './session-context';
 import { AuthLayout } from './auth-layout';
+import { useSession } from './session-context';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -44,13 +44,32 @@ export function LoginPage() {
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <div className="field">
           <label htmlFor="login-email">Email</label>
-          <input id="login-email" type="email" name="email" autoComplete="email" placeholder="you@example.com" required maxLength={254}
-            value={email} onChange={(event) => setEmail(event.target.value)} disabled={submitting} />
+          <input
+            id="login-email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            required
+            maxLength={254}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            disabled={submitting}
+          />
         </div>
         <div className="field">
           <label htmlFor="login-password">Password</label>
-          <input id="login-password" type="password" name="password" autoComplete="current-password" placeholder="Enter your password" required
-            value={password} onChange={(event) => setPassword(event.target.value)} disabled={submitting} />
+          <input
+            id="login-password"
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            required
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            disabled={submitting}
+          />
         </div>
         <button className="button button-primary button-full" type="submit" disabled={submitting}>
           {submitting ? 'Signing in…' : 'Sign in'}

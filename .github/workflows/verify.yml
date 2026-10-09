@@ -18,6 +18,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: npm run check:quality
       - run: cp apps/backend/.env.example apps/backend/.env
       - run: npm run typecheck:backend
       - run: npm run test:backend

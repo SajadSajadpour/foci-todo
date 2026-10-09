@@ -1,8 +1,8 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { ApiError } from '../../shared/api/client';
-import { authApi } from './auth-api';
 import type { Session } from './auth-api';
+import { authApi } from './auth-api';
 
 type SessionState =
   | { status: 'loading' | 'anonymous' | 'error'; session: null }

@@ -4,8 +4,8 @@ import { routes } from '../../app/routes';
 import { ApiError } from '../../shared/api/client';
 import { ErrorMessage } from '../../shared/components/feedback';
 import { useSession } from '../auth/session-context';
-import { todoApi } from './todo-api';
 import type { Todo } from './todo-api';
+import { todoApi } from './todo-api';
 
 export function DeleteTaskDialog({ todo, onDismiss }: { todo: Todo; onDismiss: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -17,7 +17,9 @@ export function DeleteTaskDialog({ todo, onDismiss }: { todo: Todo; onDismiss: (
   useEffect(() => {
     const dialog = dialogRef.current;
     dialog?.showModal();
-    return () => { if (dialog?.open) dialog.close(); };
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
   }, []);
 
   function dismiss() {
@@ -43,18 +45,35 @@ export function DeleteTaskDialog({ todo, onDismiss }: { todo: Todo; onDismiss: (
     }
   }
 
-  return <dialog ref={dialogRef} className="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description"
-    onCancel={(event) => { event.preventDefault(); if (!deleting) dismiss(); }}>
-    <div className="delete-dialog-content">
-      <h2 id="delete-title">Delete this task?</h2>
-      <p id="delete-description">“{todo.title}” will be permanently removed. This cannot be undone.</p>
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-      <div className="delete-dialog-actions">
-        <button className="button button-secondary" type="button" autoFocus disabled={deleting} onClick={dismiss}>Cancel</button>
-        <button className="button button-danger" type="button" disabled={deleting} onClick={() => void handleDelete()}>
-          {deleting ? 'Deleting…' : 'Delete task'}
-        </button>
+  return (
+    <dialog
+      ref={dialogRef}
+      className="delete-dialog"
+      aria-labelledby="delete-title"
+      aria-describedby="delete-description"
+      onCancel={(event) => {
+        event.preventDefault();
+        if (!deleting) dismiss();
+      }}
+    >
+      <div className="delete-dialog-content">
+        <h2 id="delete-title">Delete this task?</h2>
+        <p id="delete-description">“{todo.title}” will be permanently removed. This cannot be undone.</p>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        <div className="delete-dialog-actions">
+          <button className="button button-secondary" type="button" disabled={deleting} onClick={dismiss}>
+            Cancel
+          </button>
+          <button
+            className="button button-danger"
+            type="button"
+            disabled={deleting}
+            onClick={() => void handleDelete()}
+          >
+            {deleting ? 'Deleting…' : 'Delete task'}
+          </button>
+        </div>
       </div>
-    </div>
-  </dialog>;
+    </dialog>
+  );
 }

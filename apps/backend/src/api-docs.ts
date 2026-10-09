@@ -1,6 +1,6 @@
-import swagger from '@fastify/swagger';
 import { createReadStream } from 'node:fs';
 import { createRequire } from 'node:module';
+import swagger from '@fastify/swagger';
 import type { FastifyInstance } from 'fastify';
 
 const require = createRequire(import.meta.url);
@@ -108,7 +108,8 @@ export async function registerApiDocs(app: FastifyInstance): Promise<void> {
       info: {
         title: 'Foci Tasks API',
         version: '1.0.0',
-        description: 'Personal task API. Log in to receive an HttpOnly session cookie and a CSRF token. Send the token in X-CSRF-Token for authenticated state-changing requests.',
+        description:
+          'Personal task API. Log in to receive an HttpOnly session cookie and a CSRF token. Send the token in X-CSRF-Token for authenticated state-changing requests.',
       },
       tags: [
         { name: 'Health', description: 'Service status' },
@@ -117,17 +118,35 @@ export async function registerApiDocs(app: FastifyInstance): Promise<void> {
       ],
       components: {
         securitySchemes: {
-          sessionCookie: { type: 'apiKey', in: 'cookie', name: 'foci_session', description: 'HttpOnly session cookie set by login. The browser sends it automatically.' },
-          csrfToken: { type: 'apiKey', in: 'header', name: 'X-CSRF-Token', description: 'Token returned by login or GET /api/auth/me. Required for authenticated mutations.' },
+          sessionCookie: {
+            type: 'apiKey',
+            in: 'cookie',
+            name: 'foci_session',
+            description: 'HttpOnly session cookie set by login. The browser sends it automatically.',
+          },
+          csrfToken: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'X-CSRF-Token',
+            description: 'Token returned by login or GET /api/auth/me. Required for authenticated mutations.',
+          },
         },
       },
     },
   });
   // Only these named UI assets are served; no arbitrary filesystem path reaches the API.
   app.get('/api/docs', { schema: { hide: true } }, async (_request, reply) => reply.redirect('/api/docs/'));
-  app.get('/api/docs/', { schema: { hide: true } }, async (_request, reply) => reply.type('text/html; charset=utf-8').send(swaggerHtml));
+  app.get('/api/docs/', { schema: { hide: true } }, async (_request, reply) =>
+    reply.type('text/html; charset=utf-8').send(swaggerHtml),
+  );
   app.get('/api/docs/json', { schema: { hide: true } }, async (_request, reply) => reply.send(app.swagger()));
-  app.get('/api/docs/swagger-ui.css', { schema: { hide: true } }, async (_request, reply) => reply.type('text/css; charset=utf-8').send(createReadStream(swaggerCss)));
-  app.get('/api/docs/swagger-ui-bundle.js', { schema: { hide: true } }, async (_request, reply) => reply.type('application/javascript; charset=utf-8').send(createReadStream(swaggerBundle)));
-  app.get('/api/docs/init.js', { schema: { hide: true } }, async (_request, reply) => reply.type('application/javascript; charset=utf-8').send(swaggerInit));
+  app.get('/api/docs/swagger-ui.css', { schema: { hide: true } }, async (_request, reply) =>
+    reply.type('text/css; charset=utf-8').send(createReadStream(swaggerCss)),
+  );
+  app.get('/api/docs/swagger-ui-bundle.js', { schema: { hide: true } }, async (_request, reply) =>
+    reply.type('application/javascript; charset=utf-8').send(createReadStream(swaggerBundle)),
+  );
+  app.get('/api/docs/init.js', { schema: { hide: true } }, async (_request, reply) =>
+    reply.type('application/javascript; charset=utf-8').send(swaggerInit),
+  );
 }

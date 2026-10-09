@@ -35,4 +35,5 @@ export interface Store {
   updateTodo(userId: string, id: string, changes: TodoChanges): Promise<Todo | null>;
   deleteTodo(userId: string, id: string): Promise<boolean>;
 }
+
 import type { TodoListOptions, TodoListResult } from './todo-list.js';

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 async function expectAccessible(page: Page) {
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
@@ -83,7 +83,9 @@ test('a user can create, edit, complete, and delete a task', async ({ page }) =>
   await dialog.getByRole('button', { name: 'Delete task' }).click();
   await expect(page.getByRole('heading', { name: 'My tasks' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Your list starts here.' })).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(
+    true,
+  );
 });
 
 test('task filters, sort order, and pagination use the persisted task list', async ({ page }) => {
@@ -110,7 +112,8 @@ test('task filters, sort order, and pagination use the persisted task list', asy
   }
   for (const id of ids.slice(0, 2)) {
     const response = await page.request.patch(`/api/todos/${id}`, {
-      headers: { 'X-CSRF-Token': csrfToken }, data: { isCompleted: true },
+      headers: { 'X-CSRF-Token': csrfToken },
+      data: { isCompleted: true },
     });
     expect(response.status()).toBe(200);
   }

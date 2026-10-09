@@ -6,6 +6,8 @@
     "apps/frontend"
   ],
   "scripts": {
+    "check:quality": "biome check",
+    "format": "biome check --write",
     "dev:backend": "npm run dev -w @foci/backend",
     "test:backend": "npm run test -w @foci/backend",
     "test:postgres": "node scripts/test-postgres.mjs",
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@biomejs/biome": "2.5.15",
     "@playwright/test": "^1.63.0"
   }
 }

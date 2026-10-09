@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import logOutIcon from '../../assets/icons/log-out.svg';
-import { useSession } from '../auth/session-context';
 import { Brand } from '../../shared/components/brand';
 import { ErrorMessage } from '../../shared/components/feedback';
+import { useSession } from '../auth/session-context';
 
 export function TaskShell() {
   const { logout } = useSession();
@@ -23,10 +23,15 @@ export function TaskShell() {
       <header className="site-header">
         <Brand />
         <button className="text-action sign-out" type="button" onClick={() => void handleLogout()}>
-          <img src={logOutIcon} alt="" />Sign out
+          <img src={logOutIcon} alt="" />
+          Sign out
         </button>
       </header>
-      {error && <div className="shell-feedback"><ErrorMessage>{error}</ErrorMessage></div>}
+      {error && (
+        <div className="shell-feedback">
+          <ErrorMessage>{error}</ErrorMessage>
+        </div>
+      )}
       <Outlet />
     </div>
   );

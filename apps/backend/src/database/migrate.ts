@@ -1,7 +1,7 @@
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
 import { existsSync } from 'node:fs';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { Pool } from 'pg';
 
 if (existsSync('.env')) process.loadEnvFile('.env');
 

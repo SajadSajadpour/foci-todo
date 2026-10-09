@@ -31,11 +31,16 @@ export const todoApi = {
     const query = new URLSearchParams({ status, sort, page: String(page) });
     return apiRequest<TodoListResult>(`/api/todos?${query}`, { signal });
   },
-  get: (id: string, signal?: AbortSignal) => apiRequest<{ todo: Todo }>(`/api/todos/${encodeURIComponent(id)}`, { signal }),
+  get: (id: string, signal?: AbortSignal) =>
+    apiRequest<{ todo: Todo }>(`/api/todos/${encodeURIComponent(id)}`, { signal }),
   create: (todo: NewTodo, csrfToken: string) =>
     apiRequest<{ todo: Todo }>('/api/todos', { method: 'POST', body: todo, csrfToken }),
   setCompleted: (id: string, isCompleted: boolean, csrfToken: string) =>
-    apiRequest<{ todo: Todo }>(`/api/todos/${encodeURIComponent(id)}`, { method: 'PATCH', body: { isCompleted }, csrfToken }),
+    apiRequest<{ todo: Todo }>(`/api/todos/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: { isCompleted },
+      csrfToken,
+    }),
   update: (id: string, changes: NewTodo, csrfToken: string) =>
     apiRequest<{ todo: Todo }>(`/api/todos/${encodeURIComponent(id)}`, { method: 'PATCH', body: changes, csrfToken }),
   remove: (id: string, csrfToken: string) =>
