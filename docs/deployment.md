@@ -33,7 +33,7 @@ sudo docker compose --env-file /etc/opt/foci-todo/demo.env -f compose.demo.yaml 
 sudo docker compose --env-file /etc/opt/foci-todo/demo.env -f compose.demo.yaml ps
 ```
 
-Open `http://PUBLIC_IP/` and verify registration, login, task CRUD, and `http://PUBLIC_IP/api/health`. Allow inbound TCP 80 in the EC2 security group and restrict SSH to your own IP. The host does not need inbound PostgreSQL or API ports. The demo configuration is deliberately isolated from the production Compose project and does not provide TLS or durable backups. Its public home page and health endpoint were verified on October 9, 2026; an authenticated browser journey still needs manual verification on the deployed host.
+Open `http://PUBLIC_IP/` and verify registration, login, task CRUD, and `http://PUBLIC_IP/api/health`. Allow inbound TCP 80 in the EC2 security group and restrict SSH to your own IP. The host does not need inbound PostgreSQL or API ports. The demo configuration is deliberately isolated from the production Compose project and does not provide TLS or durable backups. Its public home page and health endpoint returned HTTP 200 on October 9, 2026; registration, login, and the task journey were then manually verified in a browser on the deployed host.
 
 ## Production preparation
 
