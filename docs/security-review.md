@@ -1,6 +1,6 @@
 # Security review
 
-This records assessment-demo checks completed on October 9, 2026 against `https://99-79-191-113.sslip.io/`. It is not a penetration test. The raw, unauthenticated [ZAP HTML](security-evidence/zap-2026-10-09/report.html), [JSON](security-evidence/zap-2026-10-09/report.json), and [scan configuration](security-evidence/zap-2026-10-09/zap.yaml), plus a [SonarQube Cloud API snapshot](security-evidence/sonar-2026-10-09.json), are committed for review. The public service and live scanner dashboards can change after these snapshots.
+This records assessment-demo checks completed on October 9, 2026 against `https://99-79-191-113.sslip.io/`. It is not a penetration test. The raw, unauthenticated [ZAP HTML](security-evidence/zap-2026-10-09/report.html), [JSON](security-evidence/zap-2026-10-09/report.json), and [scan configuration](security-evidence/zap-2026-10-09/zap.yaml), plus a [SonarQube Cloud API snapshot](security-evidence/sonar-2026-10-09.json), are committed for review. The scanner-generated archive is excluded from Sonar source analysis through [project configuration](../.sonarcloud.properties); it remains available in Git. The public service and live scanner dashboards can change after these snapshots.
 
 ## Automated evidence
 

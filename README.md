@@ -53,6 +53,7 @@ The local setup command creates both secret-bearing files with owner-only (`600`
 | [`apps/frontend/Caddyfile.production`](apps/frontend/Caddyfile.production) | HTTPS/TLS 1.3, same-origin API proxy, and security headers. |
 | [`.github/workflows/verify.yml`](.github/workflows/verify.yml) | Push and pull-request verification. |
 | [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) | Deploy a verified main-branch commit to EC2 through AWS Systems Manager. |
+| [`.sonarcloud.properties`](.sonarcloud.properties) | Keep archived scanner reports out of application-source quality metrics. |
 
 ```bash
 npm run test:backend
