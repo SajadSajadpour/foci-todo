@@ -23,7 +23,7 @@
 		{
 			"level": "Info",
 			"reason": "Informational",
-			"site": "https://99-79-191-113.sslip.io",
+			"site": "https://redacted.example.com",
 			"key": "insight.code.2xx",
 			"description": "Percentage of responses with status code 2xx",
 			"statistic": "100"
@@ -31,7 +31,7 @@
 		{
 			"level": "Info",
 			"reason": "Informational",
-			"site": "https://99-79-191-113.sslip.io",
+			"site": "https://redacted.example.com",
 			"key": "insight.endpoint.ctype.text/css",
 			"description": "Percentage of endpoints with content type text/css",
 			"statistic": "20"
@@ -39,7 +39,7 @@
 		{
 			"level": "Info",
 			"reason": "Informational",
-			"site": "https://99-79-191-113.sslip.io",
+			"site": "https://redacted.example.com",
 			"key": "insight.endpoint.ctype.text/html",
 			"description": "Percentage of endpoints with content type text/html",
 			"statistic": "60"
@@ -47,7 +47,7 @@
 		{
 			"level": "Info",
 			"reason": "Informational",
-			"site": "https://99-79-191-113.sslip.io",
+			"site": "https://redacted.example.com",
 			"key": "insight.endpoint.ctype.text/javascript",
 			"description": "Percentage of endpoints with content type text/javascript",
 			"statistic": "20"
@@ -55,7 +55,7 @@
 		{
 			"level": "Info",
 			"reason": "Informational",
-			"site": "https://99-79-191-113.sslip.io",
+			"site": "https://redacted.example.com",
 			"key": "insight.endpoint.method.GET",
 			"description": "Percentage of endpoints with method GET",
 			"statistic": "100"
@@ -63,7 +63,7 @@
 		{
 			"level": "Info",
 			"reason": "Informational",
-			"site": "https://99-79-191-113.sslip.io",
+			"site": "https://redacted.example.com",
 			"key": "insight.endpoint.total",
 			"description": "Count of total endpoints",
 			"statistic": "5"
@@ -71,7 +71,7 @@
 		{
 			"level": "Info",
 			"reason": "Informational",
-			"site": "https://99-79-191-113.sslip.io",
+			"site": "https://redacted.example.com",
 			"key": "insight.response.slow",
 			"description": "Percentage of slow responses",
 			"statistic": "83"
@@ -79,8 +79,8 @@
 	],
 	"site":[ 
 		{
-			"@name": "https://99-79-191-113.sslip.io",
-			"@host": "99-79-191-113.sslip.io",
+			"@name": "https://redacted.example.com",
+			"@host": "redacted.example.com",
 			"@port": "443",
 			"@ssl": "true",
 			"alerts": [ 
@@ -96,8 +96,8 @@
 					"instances":[ 
 						{
 							"id": "13",
-							"uri": "https://99-79-191-113.sslip.io/assets/index-DP3HF-bZ.js",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/assets\/index-DP3HF-bZ.js",
+							"uri": "https://redacted.example.com/assets/index-DP3HF-bZ.js",
+							"nodeName": "https:\/\/redacted.example.com\/assets\/index-DP3HF-bZ.js",
 							"method": "GET",
 							"param": "",
 							"attack": "",
@@ -126,8 +126,8 @@
 					"instances":[ 
 						{
 							"id": "4",
-							"uri": "https://99-79-191-113.sslip.io/",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/",
+							"uri": "https://redacted.example.com/",
+							"nodeName": "https:\/\/redacted.example.com\/",
 							"method": "GET",
 							"param": "",
 							"attack": "",
@@ -136,8 +136,8 @@
 						},
 						{
 							"id": "6",
-							"uri": "https://99-79-191-113.sslip.io/robots.txt",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/robots.txt",
+							"uri": "https://redacted.example.com/robots.txt",
+							"nodeName": "https:\/\/redacted.example.com\/robots.txt",
 							"method": "GET",
 							"param": "",
 							"attack": "",
@@ -146,8 +146,8 @@
 						},
 						{
 							"id": "5",
-							"uri": "https://99-79-191-113.sslip.io/sitemap.xml",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/sitemap.xml",
+							"uri": "https://redacted.example.com/sitemap.xml",
+							"nodeName": "https:\/\/redacted.example.com\/sitemap.xml",
 							"method": "GET",
 							"param": "",
 							"attack": "",
@@ -176,8 +176,8 @@
 					"instances":[ 
 						{
 							"id": "0",
-							"uri": "https://99-79-191-113.sslip.io/",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/",
+							"uri": "https://redacted.example.com/",
+							"nodeName": "https:\/\/redacted.example.com\/",
 							"method": "GET",
 							"param": "cache-control",
 							"attack": "",
@@ -186,8 +186,8 @@
 						},
 						{
 							"id": "3",
-							"uri": "https://99-79-191-113.sslip.io/robots.txt",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/robots.txt",
+							"uri": "https://redacted.example.com/robots.txt",
+							"nodeName": "https:\/\/redacted.example.com\/robots.txt",
 							"method": "GET",
 							"param": "cache-control",
 							"attack": "",
@@ -196,8 +196,8 @@
 						},
 						{
 							"id": "2",
-							"uri": "https://99-79-191-113.sslip.io/sitemap.xml",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/sitemap.xml",
+							"uri": "https://redacted.example.com/sitemap.xml",
+							"nodeName": "https:\/\/redacted.example.com\/sitemap.xml",
 							"method": "GET",
 							"param": "cache-control",
 							"attack": "",
@@ -226,8 +226,8 @@
 					"instances":[ 
 						{
 							"id": "8",
-							"uri": "https://99-79-191-113.sslip.io/",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/",
+							"uri": "https://redacted.example.com/",
+							"nodeName": "https:\/\/redacted.example.com\/",
 							"method": "GET",
 							"param": "",
 							"attack": "",
@@ -236,8 +236,8 @@
 						},
 						{
 							"id": "12",
-							"uri": "https://99-79-191-113.sslip.io/assets/index-D3PdHEjr.css",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/assets\/index-D3PdHEjr.css",
+							"uri": "https://redacted.example.com/assets/index-D3PdHEjr.css",
+							"nodeName": "https:\/\/redacted.example.com\/assets\/index-D3PdHEjr.css",
 							"method": "GET",
 							"param": "",
 							"attack": "",
@@ -246,8 +246,8 @@
 						},
 						{
 							"id": "14",
-							"uri": "https://99-79-191-113.sslip.io/assets/index-DP3HF-bZ.js",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/assets\/index-DP3HF-bZ.js",
+							"uri": "https://redacted.example.com/assets/index-DP3HF-bZ.js",
+							"nodeName": "https:\/\/redacted.example.com\/assets\/index-DP3HF-bZ.js",
 							"method": "GET",
 							"param": "",
 							"attack": "",
@@ -256,8 +256,8 @@
 						},
 						{
 							"id": "11",
-							"uri": "https://99-79-191-113.sslip.io/robots.txt",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/robots.txt",
+							"uri": "https://redacted.example.com/robots.txt",
+							"nodeName": "https:\/\/redacted.example.com\/robots.txt",
 							"method": "GET",
 							"param": "",
 							"attack": "",
@@ -266,8 +266,8 @@
 						},
 						{
 							"id": "10",
-							"uri": "https://99-79-191-113.sslip.io/sitemap.xml",
-							"nodeName": "https:\/\/99-79-191-113.sslip.io\/sitemap.xml",
+							"uri": "https://redacted.example.com/sitemap.xml",
+							"nodeName": "https:\/\/redacted.example.com\/sitemap.xml",
 							"method": "GET",
 							"param": "",
 							"attack": "",

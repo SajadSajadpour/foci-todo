@@ -33,7 +33,7 @@ class DeploymentRequestTests(TestCase):
         environment = {
             "DEPLOY_SHA": sha,
             "EC2_INSTANCE_ID": "i-0123456789abcdef0",
-            "DEPLOY_SITE_URL": "https://99-79-191-113.sslip.io",
+            "DEPLOY_SITE_URL": "https://tasks.example.com",
         }
 
         with (
@@ -50,8 +50,8 @@ class DeploymentRequestTests(TestCase):
         self.assertIn("git rev-parse refs/remotes/origin/main", command)
         self.assertIn(f"git merge --ff-only {sha}", command)
         self.assertIn("compose.production.yaml up --build --wait -d", command)
-        self.assertIn("--resolve 99-79-191-113.sslip.io:443:127.0.0.1", command)
-        self.assertIn("https://99-79-191-113.sslip.io/api/health", command)
+        self.assertIn("--resolve tasks.example.com:443:127.0.0.1", command)
+        self.assertIn("https://tasks.example.com/api/health", command)
         self.assertEqual(arguments[arguments.index("--instance-ids") + 1], environment["EC2_INSTANCE_ID"])
 
     def test_rejects_non_https_site_before_contacting_aws(self):
@@ -61,7 +61,7 @@ class DeploymentRequestTests(TestCase):
                 {
                     "DEPLOY_SHA": "a" * 40,
                     "EC2_INSTANCE_ID": "i-0123456789abcdef0",
-                    "DEPLOY_SITE_URL": "http://99-79-191-113.sslip.io",
+                    "DEPLOY_SITE_URL": "http://tasks.example.com",
                 },
             ),
             patch.object(deployment, "aws") as aws_call,

@@ -1,6 +1,6 @@
 # Container deployment
 
-The repository builds two application images: a Node API and a static React site served by Caddy. Caddy proxies `/api/*` to the API, so browser requests and session cookies stay on one origin. PostgreSQL is not exposed publicly. A one-shot migration container must finish before the API starts. The diagram shows the current HTTPS demo topology; the initial public-IP setup used HTTP.
+The repository builds two application images: a Node API and a static React site served by Caddy. Caddy proxies `/api/*` to the API, so browser requests and session cookies stay on one origin. PostgreSQL is not exposed publicly. A one-shot migration container must finish before the API starts. The diagram shows the HTTPS deployment topology; a separate HTTP configuration is available for a temporary public-IP demo.
 
 ```mermaid
 flowchart LR
@@ -24,9 +24,17 @@ Open `http://127.0.0.1:8080`. This local-only HTTP endpoint binds to loopback an
 
 ## Temporary public-IP demo
 
-`compose.demo.yaml` is a separate, disposable HTTP deployment for an assessment demo without a domain. It was used for the initial deployment and then replaced with the HTTPS configuration below. It exposes only the web server on port 80; PostgreSQL and the API remain on private container networks. Since browsers do not send `Secure` cookies over HTTP, this stack uses `NODE_ENV=demo` so login works. This is **not** the production configuration: passwords and session cookies cross the network without transport encryption. Use only throwaway accounts and non-sensitive tasks. Do not reuse passwords from any real account.
+`compose.demo.yaml` is a separate, disposable HTTP configuration for an assessment demo without a domain. It can be used for an initial connectivity check before switching to the HTTPS configuration below. It exposes only the web server on port 80; PostgreSQL and the API remain on private container networks. Since browsers do not send `Secure` cookies over HTTP, this stack uses `NODE_ENV=demo` so login works. This is **not** the production configuration: passwords and session cookies cross the network without transport encryption. Use only throwaway accounts and non-sensitive tasks. Do not reuse passwords from any real account.
 
-On the host, install Docker and clone the repository into `/opt/foci-todo`. Keep the demo settings outside the checkout in `/etc/opt/foci-todo/demo.env`, owned by root with mode `600`. Use a long random hexadecimal database password, and never commit or print the settings file. From `/opt/foci-todo`, run:
+On an Ubuntu host, install Docker Engine with the Compose plugin and Git, then prepare a dedicated checkout and private configuration directory:
+
+```bash
+sudo install -d -o ubuntu -g ubuntu -m 0755 /opt/foci-todo
+git clone https://github.com/SajadSajadpour/foci-todo.git /opt/foci-todo
+sudo install -d -o root -g root -m 0700 /etc/opt/foci-todo
+```
+
+Keep the demo settings outside the checkout in `/etc/opt/foci-todo/demo.env`, owned by root with mode `600`. Start from `.env.demo.example`, replace `DB_PASSWORD` with a long random hexadecimal value, and never commit or print the settings file. From `/opt/foci-todo`, run:
 
 ```bash
 sudo docker compose --env-file /etc/opt/foci-todo/demo.env -f compose.demo.yaml config --quiet
@@ -34,15 +42,15 @@ sudo docker compose --env-file /etc/opt/foci-todo/demo.env -f compose.demo.yaml 
 sudo docker compose --env-file /etc/opt/foci-todo/demo.env -f compose.demo.yaml ps
 ```
 
-Open `http://PUBLIC_IP/` and verify registration, login, task CRUD, and `http://PUBLIC_IP/api/health`. Allow inbound TCP 80 in the EC2 security group and restrict SSH to your own IP. The host does not need inbound PostgreSQL or API ports. The demo configuration is deliberately isolated from the production Compose project and does not provide TLS or durable backups. Its public home page and health endpoint returned HTTP 200 on October 9, 2026; registration, login, and the task journey were then manually verified in a browser on the deployed host.
+Open `http://PUBLIC_IP/` and verify registration, login, task CRUD, and `http://PUBLIC_IP/api/health`. Allow inbound TCP 80 in the EC2 security group and restrict SSH to your own IP. The host does not need inbound PostgreSQL or API ports. The demo configuration does not provide TLS or durable backups. Its Compose project can be reused during the HTTPS upgrade to retain the database volume.
 
 ## HTTPS deployment
 
-The production Compose file is running on a single EC2 host. It requires a hostname resolving to that host and inbound TCP ports 80 and 443. The assessment uses a temporary `sslip.io` hostname. Restrict SSH access to trusted addresses. Set up off-host database backups and test a restore before treating the service as durable.
+The production Compose file supports a single EC2 host. It requires a hostname resolving to that host and inbound TCP ports 80 and 443. This can be an owned domain or a temporary IP-derived DNS name such as `sslip.io`. Restrict SSH access to trusted addresses. Set up off-host database backups and test a restore before treating the service as durable.
 
-Store the deployment settings outside Git at `/etc/opt/foci-todo/production.env`, owned by root with mode `600`. For a fresh deployment, start from `.env.production.example`, set `SITE_DOMAIN` to a hostname resolving to the host, and replace `DB_PASSWORD` with a long random hexadecimal value (for example, generated by `openssl rand -hex 32`). Hexadecimal avoids reserved characters in the PostgreSQL connection URL. When upgrading an existing HTTP demo and retaining its PostgreSQL volume, copy the existing demo settings instead of changing the database password, then add `SITE_DOMAIN`.
+Store the deployment settings outside Git at `/etc/opt/foci-todo/production.env`, owned by root with mode `600`. For a fresh deployment, start from `.env.production.example`, set `SITE_DOMAIN` to a hostname resolving to the host, and replace `DB_PASSWORD` with a long random hexadecimal value (for example, generated by `openssl rand -hex 32`). Hexadecimal avoids reserved characters in the PostgreSQL connection URL. When upgrading an existing HTTP demo and retaining its PostgreSQL volume, copy the existing demo settings instead of changing the database password, then add `SITE_DOMAIN`. For example, from the checkout, use `sudo install -o root -g root -m 0600 .env.production.example /etc/opt/foci-todo/production.env` before editing the new file. Never print its contents in logs.
 
-Check the deployed file's ownership and permissions without printing its contents: `sudo stat -c '%a %U:%G %n' /etc/opt/foci-todo/production.env`. The host returned `600 root:root /etc/opt/foci-todo/production.env` on October 9, 2026. The repository alone cannot prove that the password is unique or that file permissions remain unchanged later.
+Check the deployed file's ownership and permissions without printing its contents: `sudo stat -c '%a %U:%G %n' /etc/opt/foci-todo/production.env`. Require `600 root:root /etc/opt/foci-todo/production.env`. The repository alone cannot prove that the password is unique or that file permissions remain unchanged later.
 
 ```bash
 sudo docker compose -p foci-todo-demo --env-file /etc/opt/foci-todo/production.env -f compose.production.yaml config --quiet
@@ -56,4 +64,4 @@ The production stack exposes only Caddy on ports 80/443. Caddy automatically obt
 
 After DNS and certificates are ready, verify the deployed site and API through the public domain, including registration, sign-in, task CRUD, and `curl --tlsv1.3 --tls-max 1.3 -I https://YOUR_DOMAIN`. Confirm that an HTTP request redirects to HTTPS. Do not point a real domain at this stack until the EC2 instance, DNS, backups, and production values are ready.
 
-On October 9, 2026, the EC2 demo switched from `compose.demo.yaml` to `compose.production.yaml` using the same Compose project name and database password, retaining the PostgreSQL volume. The public hostname is a temporary `sslip.io` DNS name that resolves to the EC2 address; it is not an owned domain. An external check verified a trusted certificate, TLS 1.3 handshake, HTTP-to-HTTPS redirect, and HTTP 200 responses for the home page and `/api/health`. Sign-in and the existing task list were manually verified after the application redeployment. The [continuous deployment workflow](continuous-deployment.md) uses GitHub OIDC and Systems Manager to deploy verified main-branch commits to the existing Compose project. Off-host backups, a restore drill, and a durable hostname remain outstanding for a long-lived production deployment.
+To migrate an HTTP demo without losing its PostgreSQL data, use the same Compose project name and database password when switching from `compose.demo.yaml` to `compose.production.yaml`; retain the database volume. Verify a trusted certificate, TLS 1.3 handshake, HTTP-to-HTTPS redirect, and successful responses for the home page and `/api/health`. Sign in and confirm existing tasks remain available. The [continuous deployment workflow](continuous-deployment.md) uses GitHub OIDC and Systems Manager to deploy verified main-branch commits. Off-host backups, a restore drill, and a durable hostname are required for a long-lived production deployment.

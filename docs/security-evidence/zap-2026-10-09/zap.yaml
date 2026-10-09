@@ -3,7 +3,7 @@ env:
   - excludePaths: []
     name: baseline
     urls:
-    - https://99-79-191-113.sslip.io/
+    - https://redacted.example.com/
   parameters:
     failOnError: true
     progressToStdout: false
@@ -14,11 +14,11 @@ jobs:
   type: passiveScan-config
 - parameters:
     maxDuration: 1
-    url: https://99-79-191-113.sslip.io/
+    url: https://redacted.example.com/
   type: spider
 - parameters:
     maxDuration: 1
-    url: https://99-79-191-113.sslip.io/
+    url: https://redacted.example.com/
   type: spiderClient
 - parameters:
     maxDuration: 0

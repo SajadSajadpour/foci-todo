@@ -9,7 +9,7 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 
 ## Reviewer quick start
 
-The temporary [live demo](https://99-79-191-113.sslip.io/) is open for review. Create your own account with an email address and a password of at least 12 characters, then sign in and use the task list. There is no shared demo password or seeded task data; accounts have private task lists. The [Swagger UI](https://99-79-191-113.sslip.io/api/docs/) and [OpenAPI JSON](https://99-79-191-113.sslip.io/api/docs/json) show the API. The EC2 demo is intended for the assessment period and may be shut down afterward; the repository remains runnable without it.
+The repository contains everything needed to run the app locally. There is no shared demo password or seeded task data: register your own account with an email address and a password of at least 12 characters, then sign in. Accounts have private task lists. If a hosted review URL is supplied separately, the same flow works there.
 
 To run the complete app from this Git repository, install Git, Node.js **22.12 or later**, and Docker with Compose. With Docker running:
 
@@ -26,7 +26,7 @@ This setup was checked from a fresh public Git clone on October 9, 2026: depende
 
 ## Current status
 
-Automatic EC2 deployment is active through the [AWS and GitHub setup](docs/continuous-deployment.md). It runs only after a passing main-branch verification and checks the public HTTPS health endpoint. The first end-to-end Verify and Deploy runs passed on October 9, 2026.
+The repository includes [CI-gated deployment instructions](docs/continuous-deployment.md) using GitHub OIDC and AWS Systems Manager. Deployment-specific values are configured outside Git. The workflow deploys only after a passing main-branch verification and checks the HTTPS health endpoint.
 
 | Area | Delivered |
 | --- | --- |
@@ -36,7 +36,7 @@ Automatic EC2 deployment is active through the [AWS and GitHub setup](docs/conti
 | Interface | Responsive React UI based on the Figma design, with loading and error feedback, accessible controls, and desktop/mobile browser checks. |
 | API and delivery | OpenAPI/Swagger UI, code-first Drizzle schema and migration, separate Docker images, local Compose stack, and GitHub Actions verification. |
 
-The EC2 demo runs the HTTPS Compose configuration on a temporary DNS hostname. An external check verified the trusted certificate, TLS 1.3, HTTP-to-HTTPS redirect, and successful home-page and API-health responses. Sign-in and existing tasks were verified after redeployment. SonarQube Cloud and ZAP results, including their remaining findings and limits, are recorded in the [security review](docs/security-review.md). The repeat ZAP passive baseline reports no high, medium, or low alerts; four informational alerts remain. Off-host backups and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
+The HTTPS Compose configuration uses Caddy for TLS 1.3, HTTP-to-HTTPS redirection, and same-origin API proxying. The [security review](docs/security-review.md) records SonarQube Cloud and ZAP results and their limits; the repeat passive baseline reported no high, medium, or low alerts. Off-host backups and a restore drill have not been completed. Email verification, password recovery, and MFA are outside this assessment build.
 
 ## Run as development servers
 
@@ -91,7 +91,7 @@ npm run test:e2e
 
 The backend test command runs focused calendar-date unit cases and API tests against an in-memory implementation of the storage contract; it does not require Docker. `npm run test:postgres` starts a separate, disposable PostgreSQL container on loopback port 5434, migrates it, checks real database ownership, filtering, sorting, pagination, and persistence across a connection restart, then removes the test container. It never uses the development database. The browser tests start the development Compose database, run migrations, and start the API and UI when needed. They use unique local test accounts and check task CRUD, responsive overflow, form/dialog behavior, and WCAG 2.0/2.1 A and AA rules with axe. GitHub Actions runs these checks on pushes and pull requests. The browser suite does not reset your development database; keep the local Compose database for development and repeat checks in each deployment environment.
 
-The [CI workflow](.github/workflows/verify.yml) runs Biome formatting, lint and import checks, type checks, backend unit and API tests, PostgreSQL integration tests, frontend and backend builds, desktop/mobile browser tests, production Compose validation, Docker builds, and Caddy configuration validation. Run `npm run format` to apply safe formatting and import fixes locally. The [manual ZAP baseline workflow](.github/workflows/zap-baseline.yml) performs a passive scan of the public HTTPS demo and saves a report; it does not authenticate into private task pages.
+The [CI workflow](.github/workflows/verify.yml) runs Biome formatting, lint and import checks, type checks, backend unit and API tests, PostgreSQL integration tests, frontend and backend builds, desktop/mobile browser tests, production Compose validation, Docker builds, and Caddy configuration validation. Run `npm run format` to apply safe formatting and import fixes locally. The [manual ZAP baseline workflow](.github/workflows/zap-baseline.yml) reads the HTTPS target from the `DEPLOY_SITE_URL` repository variable, performs a passive scan, and saves a report artifact; it does not authenticate into private task pages. Run it from GitHub Actions → Passive security scan → Run workflow after configuring that variable.
 
 ## Why these dependencies
 
@@ -130,6 +130,6 @@ Changes were committed in reviewable steps and checked by the [Verify workflow](
 - A due date is an optional calendar date in `YYYY-MM-DD` format. Past dates are valid, and no timezone conversion is applied. The server sets task IDs and creation timestamps.
 - PostgreSQL provides persistence across application and database-container restarts when its named volume is retained. Removing that volume deletes local data.
 - Filtering and sorting controls are optional in the brief and implemented here. The API defaults to newest first and returns at most 20 tasks per page. Offset pagination keeps this assessment's expected list sizes bounded; a cursor would be preferable for very deep lists or frequently changing large datasets.
-- The HTTPS configuration is deployed to a single EC2 host using a temporary third-party DNS hostname. A trusted certificate and TLS 1.3 were externally verified; off-host backups and a restore drill have not been completed. This short-lived assessment demo is not a durable production service.
+- The HTTPS Compose configuration targets one host. A durable service would need off-host backups, a restore drill, and an owned hostname; those operations are outside this assessment build.
 
 No AWS credentials are required to run the application locally. The [deployment guide](docs/deployment.md) records the EC2 layout, HTTPS setup, and verification boundaries.

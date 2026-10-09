@@ -58,4 +58,4 @@ flowchart LR
 
 ## Security decisions
 
-Passwords use Argon2id hashes. The API scopes task reads and writes to the authenticated user, sends session tokens in HttpOnly, SameSite=Strict cookies, and requires a per-session CSRF token for authenticated mutations. Production cookies are marked Secure. Account recovery and email verification remain outside the assessment implementation. The public EC2 demo uses the HTTPS deployment configuration; its certificate and TLS 1.3 connection were externally verified.
+Passwords use Argon2id hashes. The API scopes task reads and writes to the authenticated user, sends session tokens in HttpOnly, SameSite=Strict cookies, and requires a per-session CSRF token for authenticated mutations. Production cookies are marked Secure. Account recovery and email verification remain outside the assessment implementation. The HTTPS deployment configuration uses Caddy to obtain certificates and require TLS 1.3.

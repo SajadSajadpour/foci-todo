@@ -12,12 +12,16 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Scan the public HTTPS demo
+        env:
+          DEPLOY_SITE_URL: ${{ vars.DEPLOY_SITE_URL }}
         run: |
+          test -n "$DEPLOY_SITE_URL" || { echo 'Set DEPLOY_SITE_URL as a repository variable first' >&2; exit 1; }
+          case "$DEPLOY_SITE_URL" in https://*) ;; *) echo 'DEPLOY_SITE_URL must use HTTPS' >&2; exit 1 ;; esac
           mkdir -p zap-report
           docker run --rm --user 0 \
             -v "$GITHUB_WORKSPACE/zap-report:/zap/wrk:rw" \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t https://99-79-191-113.sslip.io/ \
+            zap-baseline.py -t "${DEPLOY_SITE_URL%/}/" \
             -m 1 -j -I -r report.html -J report.json
       - name: Save scan reports
         if: always()
