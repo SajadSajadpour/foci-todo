@@ -21,6 +21,20 @@ docker compose up --build --wait -d
 
 Open `http://127.0.0.1:8080`. This local-only HTTP endpoint binds to loopback and uses the same Compose database as the development commands. `docker compose ps` shows container health, and `docker compose logs backend web` shows server output. `docker compose down` stops the stack while preserving the database volume. The local Caddy configuration intentionally uses HTTP; the production configuration below enables HTTPS.
 
+## Temporary public-IP demo
+
+`compose.demo.yaml` is a separate, disposable HTTP deployment for an assessment demo without a domain. It exposes only the web server on port 80; PostgreSQL and the API remain on private container networks. Since browsers do not send `Secure` cookies over HTTP, this stack uses `NODE_ENV=demo` so login works. This is **not** the production configuration: passwords and session cookies cross the network without transport encryption. Use only throwaway accounts and non-sensitive tasks, and shut down the instance after the review. Do not reuse passwords from any real account.
+
+On the host, copy `.env.demo.example` to `.env.demo`, replace `DB_PASSWORD` with a long random hexadecimal value (for example, `openssl rand -hex 32`), and keep the file out of Git. After Docker and the repository are installed:
+
+```bash
+docker compose --env-file .env.demo -f compose.demo.yaml config --quiet
+docker compose --env-file .env.demo -f compose.demo.yaml up --build --wait -d
+docker compose --env-file .env.demo -f compose.demo.yaml ps
+```
+
+Open `http://PUBLIC_IP/` and verify registration, login, task CRUD, and `http://PUBLIC_IP/api/health`. Allow inbound TCP 80 in the EC2 security group and restrict SSH to your own IP. The host does not need inbound PostgreSQL or API ports. The demo configuration is deliberately isolated from the production Compose project and does not provide TLS or durable backups.
+
 ## Production preparation
 
 The production Compose file is prepared for a single EC2 host. It requires a domain pointing to that host and inbound TCP ports 80 and 443. Restrict SSH access to trusted addresses. Set up off-host database backups and test a restore before treating the service as durable.

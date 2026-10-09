@@ -47,6 +47,7 @@ To run both applications as containers instead, use `docker compose up --build -
 | [`compose.yaml`](compose.yaml) | Loopback-only local web and database stack with migration step. |
 | [`compose.test.yaml`](compose.test.yaml) | Disposable PostgreSQL instance for integration tests; separate from the development stack. |
 | [`.env.production.example`](.env.production.example) and [`compose.production.yaml`](compose.production.yaml) | Production values and service topology; replace example secrets before deployment. |
+| [`.env.demo.example`](.env.demo.example) and [`compose.demo.yaml`](compose.demo.yaml) | Isolated, temporary HTTP demo on a public IP; use only throwaway credentials and data. |
 | [`apps/frontend/Caddyfile.production`](apps/frontend/Caddyfile.production) | HTTPS/TLS 1.3, same-origin API proxy, and security headers. |
 | [`.github/workflows/verify.yml`](.github/workflows/verify.yml) | Push and pull-request verification. |
 
