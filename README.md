@@ -24,7 +24,7 @@ The EC2 demo now runs the HTTPS Compose configuration on a temporary DNS hostnam
 Requirements: Node.js 22 or later, npm, and Docker with Compose. Docker must be running for the database commands.
 
 ```bash
-npm ci
+npm ci --ignore-scripts
 npm run setup:local
 docker compose up --wait -d db
 npm run db:migrate -w @foci/backend

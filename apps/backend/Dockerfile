@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/backend/package.json apps/backend/package.json
 COPY apps/frontend/package.json apps/frontend/package.json
-RUN npm ci
+RUN npm ci --ignore-scripts
 COPY apps/backend apps/backend
 RUN npm run build:backend
 
@@ -13,7 +13,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/backend/package.json apps/backend/package.json
 COPY apps/frontend/package.json apps/frontend/package.json
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY --from=build /app/apps/backend/dist apps/backend/dist
 COPY --from=build /app/apps/backend/drizzle apps/backend/drizzle
 WORKDIR /app/apps/backend

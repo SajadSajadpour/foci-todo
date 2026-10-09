@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run check:quality
       - run: npm run setup:local
       - run: npm run typecheck:backend
@@ -30,6 +30,7 @@ jobs:
       - run: npm run test:e2e
       - run: docker compose --env-file .env.production.example -f compose.production.yaml config --quiet
       - run: docker compose build backend web
+      - run: docker run --rm foci-todo-backend:local node -e "import('argon2').then(async m => { const hash = await m.default.hash('smoke-test'); if (!(await m.default.verify(hash, 'smoke-test'))) process.exit(1) })"
       - run: docker run --rm -e SITE_DOMAIN=tasks.example.com foci-todo-web:local caddy validate --config /etc/caddy/Caddyfile.production --adapter caddyfile
       - if: failure()
         uses: actions/upload-artifact@v4
