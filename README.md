@@ -9,6 +9,8 @@ The [scope and acceptance criteria](docs/scope-and-acceptance.md), [API contract
 
 ## Current status
 
+Automatic EC2 deployment is prepared but disabled until the one-time [AWS and GitHub setup](docs/continuous-deployment.md) is complete. The deployment runs only after a passing main-branch verification.
+
 | Area | Delivered |
 | --- | --- |
 | Accounts | Registration, sign-in, session restoration, sign-out, private task ownership, Argon2id password hashes, HttpOnly session cookies, and CSRF protection. |
@@ -50,6 +52,7 @@ To run both applications as containers instead, use `docker compose up --build -
 | [`.env.demo.example`](.env.demo.example) and [`compose.demo.yaml`](compose.demo.yaml) | Isolated, temporary HTTP demo on a public IP; use only throwaway credentials and data. |
 | [`apps/frontend/Caddyfile.production`](apps/frontend/Caddyfile.production) | HTTPS/TLS 1.3, same-origin API proxy, and security headers. |
 | [`.github/workflows/verify.yml`](.github/workflows/verify.yml) | Push and pull-request verification. |
+| [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) | Deploy a verified main-branch commit to EC2 through AWS Systems Manager once enabled. |
 
 ```bash
 npm run test:backend
