@@ -85,11 +85,13 @@ export function TaskDetailPage() {
         {!loading && todo && (
           <>
             {actionError && <ErrorMessage>{actionError}</ErrorMessage>}
-            <span className={`status-label${todo.isCompleted ? ' is-complete' : ''}`}>
-              <img src={todo.isCompleted ? circleCheckIcon : circleIcon} alt="" />
-              {todo.isCompleted ? 'Completed' : 'Incomplete'}
-            </span>
-            <h1>{todo.title}</h1>
+            <header className="task-detail-heading">
+              <h1>{todo.title}</h1>
+              <span className={`status-label${todo.isCompleted ? ' is-complete' : ''}`}>
+                <img src={todo.isCompleted ? circleCheckIcon : circleIcon} alt="" />
+                {todo.isCompleted ? 'Completed' : 'Incomplete'}
+              </span>
+            </header>
             <dl className="task-detail-metadata">
               <div>
                 <dt>Due date</dt>

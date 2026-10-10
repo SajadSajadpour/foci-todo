@@ -51,6 +51,10 @@ test('a user can create, edit, complete, and delete a task', async ({ page }) =>
   await page.getByRole('button', { name: 'Create task' }).click();
   await expect(page.getByRole('heading', { name: 'Plan client handoff' })).toBeVisible();
   await expect(page.getByText('Oct 15, 2026')).toBeVisible();
+  const headingBounds = await page.getByRole('heading', { name: 'Plan client handoff' }).boundingBox();
+  const statusBounds = await page.locator('.task-detail-heading .status-label').boundingBox();
+  if (!headingBounds || !statusBounds) throw new Error('The task heading or status has no visible bounds.');
+  expect(statusBounds.y).toBeGreaterThanOrEqual(headingBounds.y + headingBounds.height);
 
   await page.getByRole('link', { name: 'Edit task' }).click();
   const title = page.getByRole('textbox', { name: 'Title (required)' });
