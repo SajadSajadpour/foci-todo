@@ -424,8 +424,13 @@
 .date-input-wrap {
   display: block;
   position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 .date-input-wrap input {
+  min-width: 0;
+  max-width: 100%;
   padding-right: 48px;
   color-scheme: light;
 }
