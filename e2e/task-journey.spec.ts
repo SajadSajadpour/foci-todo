@@ -42,10 +42,12 @@ test('a user can create, edit, complete, and delete a task', async ({ page }) =>
   await page.getByLabel('Due date (optional)').fill('2026-10-15');
   const titleBounds = await page.getByRole('textbox', { name: 'Title (required)' }).boundingBox();
   const dateBounds = await page.getByLabel('Due date (optional)').boundingBox();
-  if (!titleBounds || !dateBounds) throw new Error('A task form field has no visible bounds.');
+  const dateWrapBounds = await page.locator('.date-input-wrap').boundingBox();
+  if (!titleBounds || !dateBounds || !dateWrapBounds) throw new Error('A task form field has no visible bounds.');
   const viewportWidth = await page.evaluate(() => document.documentElement.clientWidth);
-  expect(Math.abs(dateBounds.x + dateBounds.width - (titleBounds.x + titleBounds.width))).toBeLessThan(1);
-  expect(dateBounds.x + dateBounds.width).toBeLessThanOrEqual(viewportWidth);
+  expect(Math.abs(dateWrapBounds.x + dateWrapBounds.width - (titleBounds.x + titleBounds.width))).toBeLessThan(1);
+  expect(dateWrapBounds.x + dateWrapBounds.width).toBeLessThanOrEqual(viewportWidth);
+  expect(dateBounds.x + dateBounds.width).toBeLessThanOrEqual(dateWrapBounds.x + dateWrapBounds.width);
   await page.getByRole('button', { name: 'Create task' }).click();
   await expect(page.getByRole('heading', { name: 'Plan client handoff' })).toBeVisible();
   await expect(page.getByText('Oct 15, 2026')).toBeVisible();

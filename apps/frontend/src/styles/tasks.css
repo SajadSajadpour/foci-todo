@@ -422,17 +422,44 @@
   margin: 0;
 }
 .date-input-wrap {
-  display: block;
+  display: flex;
+  align-items: center;
   position: relative;
   width: 100%;
   min-width: 0;
   max-width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+.date-input-wrap:hover:not(:has(input:disabled)) {
+  border-color: #98a69f;
+}
+.date-input-wrap:focus-within {
+  border-color: var(--focus);
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.date-input-wrap:has(input:disabled) {
+  background: #eeefea;
 }
 .date-input-wrap input {
+  flex: 1 1 auto;
   min-width: 0;
   max-width: 100%;
-  padding-right: 48px;
+  min-height: 50px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color-scheme: light;
+}
+.date-input-wrap input:focus-visible {
+  outline: none;
+}
+.date-input-wrap input:disabled {
+  background: transparent;
 }
 .date-input-wrap input::-webkit-calendar-picker-indicator {
   position: absolute;
@@ -445,7 +472,7 @@
 .date-input-wrap > img {
   position: absolute;
   right: 14px;
-  top: 16px;
+  top: 15px;
   width: 20px;
   height: 20px;
   pointer-events: none;
